@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/96d812fa-52f3-42de-9261-b23104c2d7a6/AppServices/subscriptions/96d812fa-52f3-42de-9261-b23104c2d7a6/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/leuci-web",
+    "appService.deploySubpath": "."
+}

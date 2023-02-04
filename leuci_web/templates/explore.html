@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}
+explore
+{% endblock title %}
+
+{% block content %}
+<h2>Explore Pdb Code Density Map: {{ pdb_code }} </h2>
+<hr/>
+<table style="text-align:left;border-width:2px !important;">
+    <tr style="text-align:left;border-width:2px !important;">
+        <th style="width:10%;text-align:left;border-width:2px !important;">
+            Selection
+        </th>
+        <th style="width:10%;text-align:left;border-width:2px !important;">
+            Details
+        </th>
+    </tr>
+    <tr>
+        <td style="text-align:left;border-width:2px !important;">
+            <table>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}    
+                                <label for="pdb_code">Pdb Code:</label>
+                                <input type="text" id="pdb_code" name="pdb_code" value="{{ pdb_code }}" style="width:60px;">
+                                <button type="submit">Fetch</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <th style="background-color:lightblue;">
+                        Or choose from...
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Birkbeck Structures
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="2bf9" style="width:0px;visibility:hidden;">
+                            <button type="submit">2bf9</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Small Structures
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="6eex" style="width:0px;visibility:hidden;">
+                            <button type="submit">6eex</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="6q53" style="width:0px;visibility:hidden;">
+                            <button type="submit">6q53</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Ultra-high resolution
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="1ejg" style="width:0px;visibility:hidden;">
+                            <button type="submit">1ejg</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="3nir" style="width:0px;visibility:hidden;">
+                            <button type="submit">3nir</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="5d8v" style="width:0px;visibility:hidden;">
+                            <button type="submit">5d8v</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="4rek" style="width:0px;visibility:hidden;">
+                            <button type="submit">4rek</button>
+                        </form>  
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Electron crystallography
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="6kj3" style="width:0px;visibility:hidden;">
+                            <button type="submit">6kj3</button>
+                        </form>  
+                    </td>                    
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="6kj1" style="width:0px;visibility:hidden;">
+                            <button type="submit">6kj1</button>
+                        </form>  
+                    </td>                    
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="6axz" style="width:0px;visibility:hidden;">
+                            <button type="submit">6axz</button>
+                        </form>  
+                    </td>                    
+                </tr>
+                <tr>
+                    <th>
+                        Small Cryo-EM
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="3j9e" style="width:0px;visibility:hidden;">
+                            <button type="submit">3j9e</button>
+                        </form>  
+                    </td>                    
+                </tr>
+                <tr>
+                    <th>
+                        High-res Cryo-EM
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" action="explore">
+                            {% csrf_token %}            
+                            <input type="text" id="pdb_code" name="pdb_code" value="7a6a" style="width:0px;visibility:hidden;">
+                            <button type="submit">7a6a</button>
+                        </form>  
+                    </td>  
+                </tr>                                                                                                    
+            </table>
+        </td>
+        <td>
+            <table>
+                <tr>
+                    <th>
+                        Resolution
+                    </th>
+                    <td>
+                        {{ resolution }}                        
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Ebi Link
+                    </th>
+                    <td>
+                        <a href={{ ebi_link }}>{{ pdb_code }} link</a> 
+                                                
+                    </td>
+                </tr>
+            </table>           
+        </td>
+    </tr>
+</table>
+
+
+{% endblock content%}
+
+
+

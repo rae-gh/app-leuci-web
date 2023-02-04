@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+plotly demo
+{% endblock title %}
+
+{% block content %}
+<h2>Demonstration of an interactive plotly figure</h2>
+{% autoescape off %}
+{{ plot_div }}
+{% endautoescape %}
+{% endblock content%}
+
+
+

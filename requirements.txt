@@ -1,0 +1,8 @@
+pip-upgrader
+django
+plotly
+whitenoise
+matplotlib
+pandas
+biopython
+leuci-lib

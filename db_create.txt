@@ -1,0 +1,7 @@
+"""
+The following are lines that need to be run 1-1 in the termnial in order to create 
+the database from the models that we have defined in models.py
+"""
+
+python manage.py makemigrations
+python manage.py migrate

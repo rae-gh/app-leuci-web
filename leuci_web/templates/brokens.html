@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Brokens Demo
+{% endblock title %}
+
+{% block content %}
+The links below are broken to give practise in creating a django page and updating html
+<br/>The first one works and can be examined in github and VSCode to work out how to fix the rest.
+<ul>
+    <a class="list-group-item list-group-item-action" href="{% url 'broken0' %}">Not broken example</a>    
+</ul>
+{% endblock content %}
+
