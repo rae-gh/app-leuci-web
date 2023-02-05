@@ -131,7 +131,14 @@ def rachelPlot(request):
 
 
 @csrf_exempt
-def explore(request):    
-    pdb_code, resolution, ebi_link = sd.get_pdbcode(request)
-    context = {'pdb_code': pdb_code, 'resolution':resolution, 'ebi_link':ebi_link }            
+def explore(request):
+    
+    pdb_code, resolution, ebi_link,exp_method,map_header = sd.get_pdbcode(request)            
+    context = {
+        'pdb_code': pdb_code, 
+        'resolution':resolution, 
+        'ebi_link':ebi_link,
+        'exp_method':exp_method,
+        'map_header':map_header,
+         }            
     return render(request, 'explore.html', context)

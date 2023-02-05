@@ -9,19 +9,19 @@ explore
 <hr/>
 <table style="text-align:left;border-width:2px !important;">
     <tr style="text-align:left;border-width:2px !important;">
-        <th style="width:10%;text-align:left;border-width:2px !important;">
+        <th style="width:10%;text-align:left;border-width:2px !important;background-color:gainsboro;">
             Selection
         </th>
-        <th style="width:10%;text-align:left;border-width:2px !important;">
+        <th style="width:10%;text-align:left;border-width:2px !important;background-color:gainsboro;">
             Details
         </th>
     </tr>
     <tr>
-        <td style="text-align:left;border-width:2px !important;">
+        <td style="background-color:lightcoral;">
             <table>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}    
                                 <label for="pdb_code">Pdb Code:</label>
                                 <input type="text" id="pdb_code" name="pdb_code" value="{{ pdb_code }}" style="width:60px;">
@@ -41,9 +41,9 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
-                            <input type="text" id="pdb_code" name="pdb_code" value="2bf9" style="width:0px;visibility:hidden;">
+                            <input type="text" id="pdb_code" name="pdb_code" value="2bf9" style="width:0px;visibility:hidden;">                                                        
                             <button type="submit">2bf9</button>
                         </form>  
                     </td>
@@ -54,21 +54,17 @@ explore
                     </th>
                 </tr>
                 <tr>
-                    <td>
-                        <form method="post" action="explore">
+                    <td>                        
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6eex" style="width:0px;visibility:hidden;">
                             <button type="submit">6eex</button>
-                        </form>  
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post" action="explore">
+                        </form>                      
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6q53" style="width:0px;visibility:hidden;">
                             <button type="submit">6q53</button>
-                        </form>  
+                        </form>                                              
                     </td>
                 </tr>
                 <tr>
@@ -78,16 +74,12 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="1ejg" style="width:0px;visibility:hidden;">
                             <button type="submit">1ejg</button>
-                        </form>  
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post" action="explore">
+                        </form>                      
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="3nir" style="width:0px;visibility:hidden;">
                             <button type="submit">3nir</button>
@@ -96,16 +88,12 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="5d8v" style="width:0px;visibility:hidden;">
                             <button type="submit">5d8v</button>
-                        </form>  
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post" action="explore">
+                        </form>                      
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="4rek" style="width:0px;visibility:hidden;">
                             <button type="submit">4rek</button>
@@ -119,25 +107,17 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6kj3" style="width:0px;visibility:hidden;">
                             <button type="submit">6kj3</button>
-                        </form>  
-                    </td>                    
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post" action="explore">
+                        </form>                      
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6kj1" style="width:0px;visibility:hidden;">
                             <button type="submit">6kj1</button>
-                        </form>  
-                    </td>                    
-                </tr>
-                <tr>
-                    <td>
-                        <form method="post" action="explore">
+                        </form>                      
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6axz" style="width:0px;visibility:hidden;">
                             <button type="submit">6axz</button>
@@ -151,7 +131,7 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="3j9e" style="width:0px;visibility:hidden;">
                             <button type="submit">3j9e</button>
@@ -165,7 +145,7 @@ explore
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="explore">
+                        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="7a6a" style="width:0px;visibility:hidden;">
                             <button type="submit">7a6a</button>
@@ -174,26 +154,43 @@ explore
                 </tr>                                                                                                    
             </table>
         </td>
-        <td>
-            <table>
-                <tr>
-                    <th>
-                        Resolution
-                    </th>
-                    <td>
-                        {{ resolution }}                        
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        Ebi Link
-                    </th>
-                    <td>
-                        <a href={{ ebi_link }}>{{ pdb_code }} link</a> 
-                                                
-                    </td>
-                </tr>
-            </table>           
+        <td style="vertical-align: text-top;background-color:aliceblue;">
+            <div style="padding:5px">
+                <span>
+                    <span style="font-weight: bold;">Resolution:</span>
+                    {{ resolution }}                        
+                </span>
+                <br/>
+                <span>
+                    <span style="font-weight: bold;">Experimental Method:</span>                     
+                    {{ exp_method }}
+                </span>
+                <br/>
+                <span>
+                    <span style="font-weight: bold;">Ebi Link:</span>                    
+                    <a href={{ ebi_link }}>{{ pdb_code }} link</a> 
+                </span>
+                <br/>
+                <br/>
+                <span>
+                    <span style="font-weight: bold;">Map Info:</span>                    
+                    <a href="https://www.ccp4.ac.uk/html/maplib.html#description">XRay Map Info</a> 
+                </span>
+                <br/>
+                <span>
+                    <span style="font-weight: bold;">Map Info:</span>                    
+                    <a href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php">EM Map Info</a> 
+                </span>
+                <br/>
+
+                <ul style="background-color:whitesmoke;">
+                    {% for key, value in map_header.items %} 
+                      <li>{{key}} - {{value}}</li>
+                    {% endfor %}
+                </ul>
+                                                                                                
+                
+            </div>           
         </td>
     </tr>
 </table>
