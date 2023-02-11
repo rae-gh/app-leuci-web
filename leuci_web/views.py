@@ -7,6 +7,15 @@ from django.contrib.messages.views import SuccessMessageMixin
 import plotly.graph_objects as go
 import pandas as pd
 
+# ASYNC STUFF
+import asyncio
+from asgiref.sync import sync_to_async
+from time import sleep
+import httpx
+from typing import List
+import random
+
+
 # my files
 from . import sessiondata as sd
 
@@ -90,24 +99,6 @@ def matplotlib(request):
     context = {'wind_rose': b64,'name': name }            
     return render(request, 'matplotlib.html', context)
     
-
-class DestinationDetailView(generic.DetailView):        
-    template_name = 'destination_detail.html'
-    model = models.Destination
-    context_object_name = 'destination'
-
-class CruiseDetailView(generic.DetailView):
-    template_name = 'cruise_detail.html'    
-    model = models.Cruise
-    context_object_name = 'cruise'
-
-class InfoRequestCreate(SuccessMessageMixin,generic.CreateView):
-    template_name = 'info_request_complete.html'
-    model = models.InfoRequest
-    fields = ['name','email','cruise','notes']
-    success_url=reverse_lazy('index')
-    success_message = 'Thank you, %(name)s! We will email you when we have more info about &(cruise)s'
-
 ### Brokens  ############################################################
 @csrf_exempt
 def rachelPlot(request):    
@@ -131,7 +122,7 @@ def rachelPlot(request):
 
 
 @csrf_exempt
-def explore(request):
+def density_fetch(request):
     
     pdb_code, resolution, ebi_link,exp_method,map_header = sd.get_pdbcode(request)            
     context = {
@@ -142,3 +133,150 @@ def explore(request):
         'map_header':map_header,
          }            
     return render(request, 'explore.html', context)
+
+
+# ASYNC STUFF ############################################################################################
+# helpers
+async def http_call_async():
+    for num in range(1, 6):
+        await asyncio.sleep(1)
+        print(num)
+    async with httpx.AsyncClient() as client:
+        r = await client.get("https://httpbin.org/")
+        print(r)
+
+
+def http_call_sync():
+    for num in range(1, 6):
+        sleep(1)
+        print(num)
+    r = httpx.get("https://httpbin.org/")
+    print(r)
+
+
+
+
+async def get_smokables():
+    print("Getting smokeables...")
+
+    await asyncio.sleep(2)
+    async with httpx.AsyncClient() as client:
+        await client.get("https://httpbin.org/")
+
+        print("Returning smokeable")
+        return [
+            "ribs",
+            "brisket",
+            "lemon chicken",
+            "salmon",
+            "bison sirloin",
+            "sausage",
+        ]
+
+
+async def get_flavor():
+    print("Getting flavor...")
+
+    await asyncio.sleep(1)
+    async with httpx.AsyncClient() as client:
+        await client.get("https://httpbin.org/")
+
+        print("Returning flavor")
+        return random.choice(
+            [
+                "Sweet Baby Ray's",
+                "Stubb's Original",
+                "Famous Dave's",
+            ]
+        )
+
+
+def oversmoke() -> None:
+    """ If it's not dry, it must be uncooked """
+    sleep(5)
+    print("Who doesn't love burnt meats?")
+
+# views
+async def async_view(request):
+    loop = asyncio.get_event_loop()
+    loop.create_task(http_call_async())
+    return HttpResponse("Non-blocking HTTP request")
+
+
+def sync_view(request):
+    http_call_sync()
+    return HttpResponse("Blocking HTTP request")
+
+
+async def smoke(smokables: List[str] = None, flavor: str = "Sweet Baby Ray's") -> List[str]:
+    """ Smokes some meats and applies the Sweet Baby Ray's """
+
+    for smokable in smokables:
+        print(f"Smoking some {smokable}...")
+        print(f"Applying the {flavor}...")
+        print(f"{smokable.capitalize()} smoked.")
+
+    return len(smokables)
+
+async def smoke_some_meats(request):
+    results = await asyncio.gather(*[get_smokables(), get_flavor()])
+    total = await asyncio.gather(*[smoke(results[0], results[1])])
+    return HttpResponse(f"Smoked {total[0]} meats with {results[1]}!")
+
+
+async def burn_some_meats(request):
+    oversmoke()
+    return HttpResponse(f"Burned some meats.")
+
+
+async def async_with_sync_view(request):
+    loop = asyncio.get_event_loop()
+    async_function = sync_to_async(http_call_sync, thread_sensitive=False)
+    loop.create_task(async_function())
+    return HttpResponse("Non-blocking HTTP request (via sync_to_async)")
+
+
+from pathlib import Path
+DIR = str(Path(__file__).resolve().parent )+ "/data/"
+
+def download_ed(pdbcode):
+    #pdbcode = "4rek"
+    #filename = DIR + pdb_code + ".pdb"
+    from leuci_lib import pdbobject as pob
+    my_pdb = pob.PdbObject(pdbcode)
+    my_pdb.download()
+    #filename = pdbcode + ".pdb"
+    #import urllib.request
+    #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
+
+
+async def explore(request):
+    context = {
+        'pdb_code': "", 
+        'resolution':"", 
+        'ebi_link':"",
+        'exp_method':"",
+        'map_header':{},
+        'message':""
+         }
+
+    pdb_code = "6eex"
+    if 'pdb_code' in request.POST:
+        pdb_code = request.POST.get('pdb_code')
+    from leuci_lib import pdbobject as pob
+    my_pdb = pob.PdbObject(pdb_code)
+    context['pdb_code'] = pdb_code
+    if my_pdb.exists():
+        my_pdb.load()        
+        context['resolution'] = my_pdb.resolution
+        context['ebi_link'] = my_pdb.ebi_link
+        context['exp_method'] = my_pdb.exp_method
+        context['map_header'] = my_pdb.map_header
+        return render(request, 'explore.html', context)
+    else:        
+        context['message'] = "Downloading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(download_ed, thread_sensitive=False)
+        loop.create_task(async_function(pdb_code))                
+        return render(request, 'explore.html', context)
+        

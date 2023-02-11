@@ -1,5 +1,7 @@
 pip-upgrader
 django
+uvicorn
+httpx
 plotly
 whitenoise
 matplotlib

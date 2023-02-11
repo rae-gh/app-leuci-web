@@ -57,6 +57,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://leuci-web.azurewebsites.net'
+]
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [

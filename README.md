@@ -33,6 +33,7 @@ pip install -r requirements.txt
 ```
 
 python manage.py runserver
+uvicorn project.asgi:application
 
 ```
 http://127.0.0.1:8000/
