@@ -13,9 +13,9 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-translucent-secondary" style="background:crimson !important"">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-translucent-secondary" style="background:crimson !important">
         <img src="{% static 'res/img/ED_tile.png' %}" width="60" height="auto" alt="Leuci-Web Group Logo" />
-        <a class="navbar-brand tk-elevon" href="{% url 'index' %}">&nbsp; Leuci-Web</a>
+        <a class="navbar-brand tk-elevon" href="{% url 'index' %}" style="font-family:verdana !important;">&nbsp; Leuci-Web</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
             aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -24,16 +24,16 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav ml-auto">                
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'explore' %}">Explore</a>
+                    <a class="nav-link" href="{% url 'explore' %}" style="font-family:verdana !important;">Explore</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'plotly' %}">Plotly</a>
+                    <a class="nav-link" href="{% url 'plotly' %}" style="font-family:verdana !important;">Plotly</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'matplotlib' %}">Matplotlib</a>
+                    <a class="nav-link" href="{% url 'matplotlib' %}" style="font-family:verdana !important;">Matplotlib</a>
                 </li>                
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'about' %}">About</a>
+                    <a class="nav-link" href="{% url 'about' %}" style="font-family:verdana !important;">About</a>
                 </li>                
                 
             </ul>
