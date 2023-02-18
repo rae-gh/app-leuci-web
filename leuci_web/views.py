@@ -243,7 +243,7 @@ def download_ed(pdbcode):
     #pdbcode = "4rek"
     #filename = DIR + pdb_code + ".pdb"
     from leuci_lib import pdbobject as pob
-    my_pdb = pob.PdbObject(pdbcode)
+    my_pdb = pob.PdbObject(pdbcode, directory=DIR)
     my_pdb.download()
     #filename = pdbcode + ".pdb"
     #import urllib.request
@@ -264,7 +264,7 @@ async def explore(request):
     if 'pdb_code' in request.POST:
         pdb_code = request.POST.get('pdb_code')
     from leuci_lib import pdbobject as pob
-    my_pdb = pob.PdbObject(pdb_code)
+    my_pdb = pob.PdbObject(pdb_code,directory=DIR)
     context['pdb_code'] = pdb_code
     if my_pdb.exists():
         my_pdb.load()        
