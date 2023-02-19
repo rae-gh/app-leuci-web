@@ -10,18 +10,18 @@ explore
 <hr/>
 <table style="text-align:left;border-width:2px !important;">
     <tr style="text-align:left;border-width:2px !important;">
-        <th style="width:10%;text-align:left;border-width:2px !important;background-color:gainsboro;">
+        <th style="text-align:left;border-width:2px !important;background-color:gainsboro;">
             Selection
         </th>
-        <th style="width:10%;text-align:left;border-width:2px !important;background-color:gainsboro;">
+        <th style="text-align:left;border-width:2px !important;background-color:gainsboro;">
             Details
         </th>
     </tr>
     <tr>
-        <td style="background-color:lightcoral;">
+        <td style="background-color:rgb(162,162,208);">
             <table>
                 <tr>
-                    <td>
+                    <td colspan="4">
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}    
                                 <label for="pdb_code">Pdb Code:</label>
@@ -31,12 +31,12 @@ explore
                     </td>
                 </tr>
                 <tr>
-                    <th style="background-color:lightblue;">
+                    <th colspan="4" style="background-color:gainsboro;">
                         Or choose from...
                     </th>
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         Birkbeck Structures
                     </th>
                 </tr>
@@ -48,9 +48,12 @@ explore
                             <button type="submit">2bf9</button>
                         </form>  
                     </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         Small Structures
                     </th>
                 </tr>
@@ -61,15 +64,19 @@ explore
                             <input type="text" id="pdb_code" name="pdb_code" value="6eex" style="width:0px;visibility:hidden;">
                             <button type="submit">6eex</button>
                         </form>                      
+                    </td>
+                    <td>
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6q53" style="width:0px;visibility:hidden;">
                             <button type="submit">6q53</button>
                         </form>                                              
                     </td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         Ultra-high resolution
                     </th>
                 </tr>
@@ -80,20 +87,22 @@ explore
                             <input type="text" id="pdb_code" name="pdb_code" value="1ejg" style="width:0px;visibility:hidden;">
                             <button type="submit">1ejg</button>
                         </form>                      
+                    </td>
+                    <td>
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="3nir" style="width:0px;visibility:hidden;">
                             <button type="submit">3nir</button>
                         </form>  
-                    </td>
-                </tr>
-                <tr>
+                    </td>                    
                     <td>
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="5d8v" style="width:0px;visibility:hidden;">
                             <button type="submit">5d8v</button>
                         </form>                      
+                    </td>                    
+                    <td>
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="4rek" style="width:0px;visibility:hidden;">
@@ -102,7 +111,7 @@ explore
                     </td>
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         Electron crystallography
                     </th>
                 </tr>
@@ -112,21 +121,26 @@ explore
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6kj3" style="width:0px;visibility:hidden;">
                             <button type="submit">6kj3</button>
-                        </form>                      
+                        </form>     
+                    </td>                    
+                    <td>                 
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6kj1" style="width:0px;visibility:hidden;">
                             <button type="submit">6kj1</button>
                         </form>                      
+                    </td>                    
+                    <td>
                         <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
                             {% csrf_token %}            
                             <input type="text" id="pdb_code" name="pdb_code" value="6axz" style="width:0px;visibility:hidden;">
                             <button type="submit">6axz</button>
                         </form>  
                     </td>                    
+                    <td></td>
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         Small Cryo-EM
                     </th>
                 </tr>
@@ -137,10 +151,13 @@ explore
                             <input type="text" id="pdb_code" name="pdb_code" value="3j9e" style="width:0px;visibility:hidden;">
                             <button type="submit">3j9e</button>
                         </form>  
-                    </td>                    
+                    </td>         
+                    <td></td>
+                    <td></td>
+                    <td></td>                               
                 </tr>
                 <tr>
-                    <th>
+                    <th colspan="4">
                         High-res Cryo-EM
                     </th>
                 </tr>
@@ -151,7 +168,10 @@ explore
                             <input type="text" id="pdb_code" name="pdb_code" value="7a6a" style="width:0px;visibility:hidden;">
                             <button type="submit">7a6a</button>
                         </form>  
-                    </td>  
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>                                                                                                    
             </table>
         </td>
@@ -169,26 +189,27 @@ explore
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Ebi Link:</span>                    
-                    <a href={{ ebi_link }}>{{ pdb_code }} link</a> 
+                    <a href={{ ebi_link }} target = "_blank">{{ pdb_code }} link</a> 
                 </span>
                 <br/>
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Map Info:</span>                    
-                    <a href="https://www.ccp4.ac.uk/html/maplib.html#description">XRay Map Info</a> 
+                    <a href="https://www.ccp4.ac.uk/html/maplib.html#description" target = "_blank">XRay Map Info</a> 
                 </span>
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Map Info:</span>                    
-                    <a href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php">EM Map Info</a> 
+                    <a href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php" target = "_blank">EM Map Info</a> 
                 </span>
                 <br/>
+                <textarea cols="50" rows="20">{{header_string}}</textarea>
 
-                <ul style="background-color:whitesmoke;">
+                <!--<ul style="background-color:whitesmoke;">
                     {% for key, value in map_header.items %} 
                       <li>{{key}} - {{value}}</li>
                     {% endfor %}
-                </ul>
+                </ul>-->
                                                                                                 
                 
             </div>           

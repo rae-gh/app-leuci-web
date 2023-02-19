@@ -18,6 +18,7 @@ import random
 
 # my files
 from . import sessiondata as sd
+from .classes import admin as adm
 
 # Create your views here.
 def index(request):
@@ -235,21 +236,35 @@ async def async_with_sync_view(request):
     loop.create_task(async_function())
     return HttpResponse("Non-blocking HTTP request (via sync_to_async)")
 
+#####################################################################################################################################
 
 from pathlib import Path
+import datetime    
+import logging 
+from django.http import JsonResponse
+from asgiref.sync import async_to_sync, sync_to_async
+
 DIR = str(Path(__file__).resolve().parent )+ "/data/"
 
-def download_ed(pdbcode):
-    #pdbcode = "4rek"
-    #filename = DIR + pdb_code + ".pdb"
+def download_ed(pdbcode):    
     from leuci_lib import pdbobject as pob
     my_pdb = pob.PdbObject(pdbcode, directory=DIR)
-    my_pdb.download()
-    #filename = pdbcode + ".pdb"
+    my_pdb.download()    
     #import urllib.request
     #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
 
+gl_user = ""
+gl_ip = ""
 
+@sync_to_async
+def get_user(request):
+    gl_user = request.user.id    
+    #gl_ip = request.META['REMOTE_ADDR']
+    #from ipware import get_client_ip
+    gl_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
+    #gl_ip, is_routable = get_client_ip(request)
+    
+        
 async def explore(request):
     context = {
         'pdb_code': "", 
@@ -263,20 +278,52 @@ async def explore(request):
     pdb_code = "6eex"
     if 'pdb_code' in request.POST:
         pdb_code = request.POST.get('pdb_code')
+    get_user(request)
+    
     from leuci_lib import pdbobject as pob
     my_pdb = pob.PdbObject(pdb_code,directory=DIR)
-    context['pdb_code'] = pdb_code
+    context['pdb_code'] = pdb_code        
+    logging.info("INFO:\t" + gl_user + "\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
     if my_pdb.exists():
-        my_pdb.load()        
         context['resolution'] = my_pdb.resolution
         context['ebi_link'] = my_pdb.ebi_link
         context['exp_method'] = my_pdb.exp_method
-        context['map_header'] = my_pdb.map_header
+        my_pdb.load()
+        if my_pdb.em_loaded:
+            context['map_header'] = my_pdb.map_header
+            context['header_string'] = my_pdb.header_as_string
         return render(request, 'explore.html', context)
+        
     else:        
+        context['ebi_link'] = my_pdb.ebi_link
         context['message'] = "Downloading... "        
         loop = asyncio.get_event_loop()
         async_function = sync_to_async(download_ed, thread_sensitive=False)
         loop.create_task(async_function(pdb_code))                
         return render(request, 'explore.html', context)
+
+@csrf_exempt
+def admin(request):
+    act = ""
+    if 'act' in request.POST:
+        act = request.POST.get('act')
+    
+    context = {}    
+    adm_fetch = adm.AdminClass()    
+    log_all = False
+    if act == "data_show2":
+        log_all = True
+
+    if act == "logs_delete":
+        context['logs_formatted'] = adm_fetch.delete_logs()
+    else:
+        context['logs_formatted'] = adm_fetch.show_logs(formatted=True,all=log_all)
+    
+    if act == "data_delete":
+        context['data_formatted'] = adm_fetch.delete_data()
+    else:
+        context['data_formatted'] = adm_fetch.show_data(formatted=True)
+
+                        
+    return render(request, 'admin.html', context)
         

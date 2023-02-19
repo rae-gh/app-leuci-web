@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}
+explore
+{% endblock title %}
+
+{% block content %}
+<h2>Admin for Leucippus</h2>
+<h3>{{ message }} </h3>
+<hr/>
+
+<table>
+    <tr><th colspan="4">Actions</th</tr>
+    <tr>
+        <td style="padding:5px !important;vertical-align:top !important">            
+            <form method="post" action="admin" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="act" name="act" value="data_show1" style="width:0px;visibility: hidden;">
+                    <button type="submit">Report log 1</button>
+            </form>  
+        </td>
+        <td>
+            <form method="post" action="admin" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="act" name="act" value="data_show2" style="width:0px;visibility: hidden;">
+                    <button type="submit">Report log 2</button>
+            </form>  
+        </td>
+        <td>
+            <form method="post" action="admin" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="act" name="act" value="logs_delete" style="width:0px;visibility: hidden;">
+                    <button type="submit">Delete logs</button>
+            </form>  
+        </td>
+        <td>
+            <form method="post" action="admin" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="act" name="act" value="data_delete" style="width:0px;visibility: hidden;">
+                    <button type="submit">Delete data</button>
+            </form>      
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:5px !important;vertical-align:top !important">
+            <a href="https://leuci-web.scm.azurewebsites.net/" target = "_blank">Azure admin</a>                                                                    
+        </td>
+        <td>
+            <a href="https://leuci-web.scm.azurewebsites.net/webssh/host" target = "_blank">ssh admin</a>
+        </td>
+    </tr>
+    
+</table>
+<hr/>
+
+<table style="text-align:left;border-width:2px !important;padding:5px !important">
+    <tr style="text-align:left;border-width:2px !important;vertical-align:top !important;">        
+        <th style="width:40%;text-align:left;border-width:2px !important;background-color:gainsboro;padding:5px !important">
+            Data files            
+        </th>
+        <th style="width:60%;text-align:left;border-width:2px !important;background-color:gainsboro;padding:5px !important">
+            Logs
+        </th>
+    </tr>
+    <tr>        
+        <td style="vertical-align: text-top;background-color:lightpink;padding:5px">  
+            <textarea rows="20" cols="50">{{data_formatted}}</textarea>
+        </td>
+        <td style="vertical-align: text-top;background-color:pink;padding:5px">
+            <textarea rows="20" cols="80">{{logs_formatted}}</textarea>
+        </td>
+    </tr>
+</table>
+
+
+{% endblock content%}
+
+
+
