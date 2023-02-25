@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+projection
+{% endblock title %}
+
+{% block content %}
+<h2>Projection of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+<h3>{{ message }} </h3>
+{% autoescape off %}
+<table width="1200px">    
+    <tr>
+        <th style="text-align:center !important; width:400px">Density</th>
+        <th style="text-align:center !important; width:400px">Radient</th>
+        <th style="text-align:center !important; width:400px">Laplacian</th>
+    </tr>        
+    <tr>
+        <td>
+            {{ plot_div1 }}
+        </td>
+        <td>
+            {{ plot_div2 }}
+        </td>
+        <td>
+            {{ plot_div3 }}
+        </td>
+    </tr>
+</table>
+
+{% endautoescape %}
+<p>
+    {{value_len}}
+    {{value_check}}
+</p>
+  
+{% endblock content%}
+
+
+

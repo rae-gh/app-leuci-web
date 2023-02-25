@@ -122,20 +122,6 @@ def rachelPlot(request):
     return render(request, 'broken0.html', context)
 
 
-@csrf_exempt
-def density_fetch(request):
-    
-    pdb_code, resolution, ebi_link,exp_method,map_header = sd.get_pdbcode(request)            
-    context = {
-        'pdb_code': pdb_code, 
-        'resolution':resolution, 
-        'ebi_link':ebi_link,
-        'exp_method':exp_method,
-        'map_header':map_header,
-         }            
-    return render(request, 'explore.html', context)
-
-
 # ASYNC STUFF ############################################################################################
 # helpers
 async def http_call_async():
@@ -246,23 +232,22 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 DIR = str(Path(__file__).resolve().parent )+ "/data/"
 
-def download_ed(pdbcode):    
-    from leuci_lib import pdbobject as pob
-    my_pdb = pob.PdbObject(pdbcode, directory=DIR)
-    my_pdb.download()    
-    #import urllib.request
-    #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
 
-gl_user = ""
-gl_ip = ""
 
 @sync_to_async
 def get_user(request):
-    gl_user = request.user.id    
-    #gl_ip = request.META['REMOTE_ADDR']
+    #gl_user = request.user.id    
+    gl_user = ""
+    gl_ip = str(request.META['REMOTE_ADDR'])
+    gl_fwd = ""
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
+        gl_fwd = str(request.META['HTTP_X_FORWARDED_FOR'])
+    gl_rem = str(request.META['REMOTE_ADDR'])
+    
     #from ipware import get_client_ip
-    gl_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
+    #gl_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()    
     #gl_ip, is_routable = get_client_ip(request)
+    return gl_user, gl_ip + ":" + gl_fwd + ":" + gl_rem
     
         
 async def explore(request):
@@ -272,43 +257,51 @@ async def explore(request):
         'ebi_link':"",
         'exp_method':"",
         'map_header':{},
-        'message':""
-         }
-
-    pdb_code = "6eex"
-    if 'pdb_code' in request.POST:
-        pdb_code = request.POST.get('pdb_code')
-    get_user(request)
+        'message':"",
+        'header_string':"",
+         }                
     
-    from leuci_lib import pdbobject as pob
-    my_pdb = pob.PdbObject(pdb_code,directory=DIR)
-    context['pdb_code'] = pdb_code        
-    logging.info("INFO:\t" + gl_user + "\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
-    if my_pdb.exists():
-        context['resolution'] = my_pdb.resolution
-        context['ebi_link'] = my_pdb.ebi_link
-        context['exp_method'] = my_pdb.exp_method
-        my_pdb.load()
-        if my_pdb.em_loaded:
-            context['map_header'] = my_pdb.map_header
-            context['header_string'] = my_pdb.header_as_string
+    context["full_url"] = await sd.get_url(request, ["pdb_code"])    
+    gl_user, gl_ip = await get_user(request)            
+    pdb_code, in_store,exists, ready, mload = await sd.get_pdbcode(request)
+    if pdb_code == "":
         return render(request, 'explore.html', context)
-        
-    else:        
-        context['ebi_link'] = my_pdb.ebi_link
-        context['message'] = "Downloading... "        
-        loop = asyncio.get_event_loop()
-        async_function = sync_to_async(download_ed, thread_sensitive=False)
-        loop.create_task(async_function(pdb_code))                
-        return render(request, 'explore.html', context)
-
-@csrf_exempt
-def admin(request):
+    print(pdb_code, in_store,exists, ready)        
+    context['pdb_code'] = pdb_code    
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
+    if not in_store:
+        if not exists:
+            context['ebi_link'] = mload.mobj.ebi_link
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                
+            return render(request, 'explore.html', context)
+        else:                                
+            mload = await sd.load_mapheader(request,pdb_code,mload)
+            # get the actual values asynchronously as they take forever
+            loop2 = asyncio.get_event_loop()
+            async_function2 = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            loop2.create_task(async_function2(request,pdb_code,gl_ip))                
+                                            
+    my_pdb = mload.mobj
+    #print(my_pdb)
+    context['resolution'] = my_pdb.resolution
+    context['ebi_link'] = my_pdb.ebi_link
+    context['exp_method'] = my_pdb.exp_method            
+    if "x-ray" in my_pdb.exp_method:        
+        context['header_string'] = my_pdb.header_as_string            
+    print("rendering...")
+    return render(request, 'explore.html', context)
+                        
+async def admin(request):
     act = ""
     if 'act' in request.POST:
         act = request.POST.get('act')
     
-    context = {}    
+    context = {}
+    gl_user, gl_ip = await get_user(request)
+    pdb_code, in_store,exists, ready, mload = await sd.get_pdbcode(request)
     adm_fetch = adm.AdminClass()    
     log_all = False
     if act == "data_show2":
@@ -323,7 +316,104 @@ def admin(request):
         context['data_formatted'] = adm_fetch.delete_data()
     else:
         context['data_formatted'] = adm_fetch.show_data(formatted=True)
-
-                        
+        
+    context["pdb_code"]= pdb_code
+        
+    context["json"] = sd.get_store_info(gl_ip)
+                            
+    print("rendering...")
     return render(request, 'admin.html', context)
+
+#https://plotly.com/python-api-reference/generated/plotly.graph_objects.Contour.html?highlight=contour#plotly.graph_objects.Contour
+async def projection(request):
+    context = {}
+    context["full_url"] = await sd.get_url(request, ["pdb_code"])
+    context['message'] = ""
+    # we should already have loaded this asynchronously, too late now if we haven't
+    gl_user, gl_ip = await get_user(request)    
+    pdb_code, in_store, exists, ready_header, mload = await sd.get_pdbcode(request)            
+    context['pdb_code'] = pdb_code    
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')
+    context["value_check"] = -1
+    context["value_len"] = -1
+    if not in_store:
+        if not exists:
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                        
+        elif ready_header:
+            context['message'] = "Uploading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+        else:
+            context['message'] = "Uploading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    else:                                
+        if len(mload.mobj.values) > 0:
+            context["value_check"] = mload.mobj.values[0]
+            context["value_len"] = len(mload.mobj.values)
+                    
+    xy = [  [1,2,3,4,5],
+            [6,7,8,9,10],
+            [0.2,3,8,9,1],
+            [0.2,2,2,2,1],
+            [0,1,1,1,-2]] 
+        
+    from .classes import plotter
+    context["plot_div1"] = plotter.makeContour(xy)
+    context["plot_div2"] = plotter.makeHeatmap(xy)
+    context["plot_div3"] = plotter.makeContour(xy)
+            
+    print("rendering...")
+    return render(request, 'projection.html', context)
+
+async def slice(request):
+    context = {}
+    context["full_url"] = await sd.get_url(request, ["pdb_code"])
+    context['message'] = ""
+    # we should already have loaded this asynchronously, too late now if we haven't
+    gl_user, gl_ip = await get_user(request)    
+    pdb_code, in_store, exists, ready_header, mload = await sd.get_pdbcode(request)            
+    context['pdb_code'] = pdb_code    
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice at '+str(datetime.datetime.now())+' hours')
+    context["value_check"] = -1
+    context["value_len"] = -1
+    if not in_store:
+        if not exists:
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                        
+        elif ready_header:
+            context['message'] = "Uploading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+        else:
+            context['message'] = "Uploading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    else:                                
+        if len(mload.mobj.values) > 0:
+            context["value_check"] = mload.mobj.values[0]
+            context["value_len"] = len(mload.mobj.values)
+                    
+    xy = [  [1,2,3,4,5],
+            [6,7,8,9,10],
+            [0.2,3,8,9,1],
+            [0.2,2,2,2,1],
+            [0,1,1,1,-2]] 
+            
+    context["density_mat"] = xy
+    context["radient_mat"] = xy
+    context["laplacian_mat"] = xy
+        
+    print("rendering...")
+    return render(request, 'slice.html', context)
+        
         

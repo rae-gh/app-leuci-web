@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!j9cqzmv0!e7vx+++qp(pj!01)kiyd!567!o++mn+i4lr5(61g'
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in produc  tion!
 ### These settings are for debug ###
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -58,7 +58,7 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://leuci-web.azurewebsites.net'
+    'https://leuci-web.azurewebsites.net'    
 ]
 
 ROOT_URLCONF = 'project.urls'

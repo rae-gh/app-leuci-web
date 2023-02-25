@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}
 explore
 {% endblock title %}
@@ -40,6 +42,13 @@ explore
                     <button type="submit">Delete data</button>
             </form>      
         </td>
+        <td>
+            <form method="post" action="admin" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="act" name="act" value="clear_memory" style="width:0px;visibility: hidden;">
+                    <button type="submit">Clear memory</button>
+            </form>      
+        </td>
     </tr>
     <tr>
         <td style="padding:5px !important;vertical-align:top !important">
@@ -61,13 +70,19 @@ explore
         <th style="width:60%;text-align:left;border-width:2px !important;background-color:gainsboro;padding:5px !important">
             Logs
         </th>
+        <th style="width:60%;text-align:left;border-width:2px !important;background-color:gainsboro;padding:5px !important">
+            {{pdb_code}}
+        </th>
     </tr>
     <tr>        
         <td style="vertical-align: text-top;background-color:lightpink;padding:5px">  
-            <textarea rows="20" cols="50">{{data_formatted}}</textarea>
+            <textarea rows="18" cols="40">{{data_formatted}}</textarea>
         </td>
         <td style="vertical-align: text-top;background-color:pink;padding:5px">
-            <textarea rows="20" cols="80">{{logs_formatted}}</textarea>
+            <textarea rows="18" cols="70">{{logs_formatted}}</textarea>
+        </td>
+        <td style="vertical-align: text-top;background-color:pink;padding:5px">
+            <textarea rows="18" cols="40">{{json}}</textarea>            
         </td>
     </tr>
 </table>

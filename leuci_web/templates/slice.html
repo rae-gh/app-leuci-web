@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+slice
+{% endblock title %}
+
+{% block content %}
+<script src="{% static 'js/make_plot.js' %}"></script>
+<script src="{% static 'js/first.js' %}"></script>
+
+<h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+<h3>{{ message }} </h3>
+<table>
+    <tr>
+        <td>
+            <table>    
+                <tr>
+                    <th>Central</th>
+                    <th>Linear</th>
+                    <th>Planar</th>                    
+                </tr>
+                <tr>
+                    <td><input id="cen_coords" value='(0.1000, 1.2000, 2.1000)' name="cen_coords"/></td>        
+                    <td><input id="lin_coords" value='(1.1000, 3.2000, 2.1000)' name="lin_coords"/></td>                    
+                    <td><input id="pla_coords" value='(2.1000, 0.2000, 0.1000)' name="pla_coords"/></td>
+                </tr>
+                
+            </table>
+        </td>    
+        <td>
+            <table>
+                <tr>        
+                    <td style="width:10%;">Floor%</td>
+                    <td style="width:60%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>
+                </tr>
+                <tr>
+                    <td style="width:10%">Cap%</td>
+                    <td style="width:60%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
+                </tr>
+            </table>    
+        </td>
+    </tr>
+</table>
+<br/>
+<hr/>
+<table width="1200px">    
+    <tr>
+        <th style="text-align:left !important; width:400px">Density</th>
+        <th style="text-align:left !important; width:400px">Radient</th>
+        <th style="text-align:left !important; width:400px">Laplacian</th>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
+            <button onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
+            <button onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>
+            
+        </td>        
+        <td>
+            <button onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
+            <button onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
+            <button onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
+            
+        </td>        
+        <td>
+            <button onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
+            <button onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
+            <button onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
+        </td>        
+    </tr>    
+    <tr>
+        <td><div id="slice_density" style="width:100%"></div></td>            
+        <td><div id="slice_radient" style="width:100%"></div></td>            
+        <td><div id="slice_laplacian" style="width:100%"></div></td>                    
+    </tr>    
+</table>
+<p>
+    {{value_len}}
+    {{value_check}}
+</p>
+<p style="display:none;visibility:collapse">
+    <!-- HIDDEN VALUES -->
+    <input id="den_plot_name" value='contour' name="den_plot_name"/>
+    <input id="rad_plot_name" value='heatmap' name="rad_plot_name"/>
+    <input id="lap_plot_name" value='contour' name="lap_plot_name"/>
+    <input id="den_bar_name" value='N' name="den_bar_name"/>
+    <input id="rad_bar_name" value='N' name="rad_bar_name"/>
+    <input id="lap_bar_name" value='N' name="lap_bar_name"/>
+    <input id="den_hue_name" value='GBR' name="den_hue_name"/>
+    <input id="rad_hue_name" value='BW' name="rad_hue_name"/>
+    <input id="lap_hue_name" value='BR' name="lap_hue_name"/>
+</p>
+<!-- page functions -->
+<script>
+    function makePlotSliceP(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
+        try{                                    
+            var cplot = document.getElementById(plot_id).value;
+            var cbar = document.getElementById(bar_id).value;
+            var chue = document.getElementById(hue_id).value;
+            var sMin = document.getElementById("rangeValueMin").value;
+            var sMax = document.getElementById("rangeValueMax").value;
+            if (deriv > 0){
+                sMin = 100;
+                sMax = 100;
+            }
+            //plot type = element to change
+            if (cplot == "heatmap"){
+                document.getElementById(plot_id).value = "contour";
+            }else{
+                document.getElementById(plot_id).value = "heatmap";
+            }
+            var cplot = document.getElementById(plot_id).value;
+            var mat_den = jQuery.parseJSON(mat_string);
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);        
+        }catch(err){
+            alert(err.message)
+        }
+    }
+</script>
+<script>
+    function makePlotSliceB(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
+        try{                                    
+            var cplot = document.getElementById(plot_id).value;
+            var cbar = document.getElementById(bar_id).value;
+            var chue = document.getElementById(hue_id).value;    
+            var sMin = document.getElementById("rangeValueMin").value;
+            var sMax = document.getElementById("rangeValueMax").value;
+            if (deriv > 0){
+                sMin = 100;
+                sMax = 100;
+            }                
+            //colour bar = element to change
+            if (cbar == "Y"){
+                document.getElementById(bar_id).value = "N";
+            }else{
+                document.getElementById(bar_id).value = "Y";
+            }
+            var cbar = document.getElementById(bar_id).value;
+            var mat_den = jQuery.parseJSON(mat_string);
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);               
+        }catch(err){
+            alert(err.message)
+        }
+    }
+</script>
+<script>
+    function makePlotSliceH(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
+        try{                                    
+            var cplot = document.getElementById(plot_id).value;
+            var cbar = document.getElementById(bar_id).value;
+            var chue = document.getElementById(hue_id).value;      
+            var sMin = document.getElementById("rangeValueMin").value;
+            var sMax = document.getElementById("rangeValueMax").value;                  
+            if (deriv > 0){
+                sMin = 100;
+                sMax = 100;
+            }
+            //hue = element to change
+            if (chue == "GBR"){
+                document.getElementById(hue_id).value = "BW";
+            }else if (chue == "BW"){
+                document.getElementById(hue_id).value = "BR";
+            }else{
+                document.getElementById(hue_id).value = "GBR";
+            }
+            var chue = document.getElementById(hue_id).value;
+            var mat_den = jQuery.parseJSON(mat_string);
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);        
+        }catch(err){
+            alert(err.message)
+        }
+    }
+</script>
+<script>
+    var sliderMin = document.getElementById("rangeValueMin");
+
+    sliderMin.oninput = function () {
+        try{                                 
+            var cplot = document.getElementById("den_plot_name").value;
+            var cbar = document.getElementById("den_bar_name").value;
+            var chue = document.getElementById("den_hue_name").value;      
+            var sMin = document.getElementById("rangeValueMin").value;
+            var sMax = document.getElementById("rangeValueMax").value;                                          
+            var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');                
+            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax);        
+        }catch(err){
+            alert(err.message)
+        }
+    }
+</script>
+<script>
+    var sliderMax = document.getElementById("rangeValueMax");
+
+    sliderMax.oninput = function () {
+        try{                                 
+            var cplot = document.getElementById("den_plot_name").value;
+            var cbar = document.getElementById("den_bar_name").value;
+            var chue = document.getElementById("den_hue_name").value;      
+            var sMin = document.getElementById("rangeValueMin").value;
+            var sMax = document.getElementById("rangeValueMax").value;                                          
+            var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');                
+            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax);        
+        }catch(err){
+            alert(err.message)
+        }
+    }
+</script>
+<!-- page refresh-->
+<script>
+    try{
+        var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');    
+        var mat_rad = jQuery.parseJSON('{{ radient_mat|escapejs }}');    
+        var mat_lap = jQuery.parseJSON('{{ laplacian_mat|escapejs }}');            
+        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100);
+        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100);
+        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100);
+    }catch(err){
+        alert(err.message);
+    }
+</script>
+{% endblock content%}
+
+
+

@@ -70,7 +70,7 @@ class AdminClass(object):
                 sz = os.path.getsize(fullpath)
                 self.data_dic[file] = (int)(sz/1000)
                 form_str += file
-                if len(file) <= 8 and "1" in file: 
+                if len(file) <= 8 and ("1" in file or "i" in file): 
                     form_str += "\t"
                 if len(file) <= 9: 
                     form_str += "\t"

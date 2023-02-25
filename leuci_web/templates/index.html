@@ -4,11 +4,14 @@
 
 
 
+
 {% block title %}
 Leuci-Web
 {% endblock title%}
 
 {% block content %}
+<script src="{% static 'js/first.js' %}"></script>
+<button onclick="myFunction()">Click me!</button>
 <h1>Leucippus - Electron Density Map Browser</h1>
 <p>An application to explore electron density in x-ray crystal structures and cryo-EM structures
 <br/>This application faciliates the exploration of the electron density of x-ray and cryo-EM structures, exploring the 3d matrices of their electron distributions.
@@ -18,7 +21,7 @@ Leuci-Web
 <h1>Leucippus, the Greek Philosopher</h1>
 <p>
 Leucippus, a pre-Socratic Greek philosopher, is considered to be the first philosopher to develop the theory of atomism.
-Atomism is a natural philosphpy that proposes that the physical universe is made up of indivisible components called atoms. Between atoms there is void, which is the possible space that atoms can (or do) occupy.
+Atomism is a natural philosophy that proposes that the physical universe is made up of indivisible components called atoms. Between atoms there is void, which is the possible space that atoms can (or do) occupy.
 Leucippus' student, Democritus, gained far more fame both then and now. Leucippus' work is known through the writings of Democritus.
 Information taken from Wikipedia Stanford
 </p>
@@ -26,6 +29,8 @@ Information taken from Wikipedia Stanford
 <h1>Some examples from the literature</h1>
 
 <a href="https://leucippus2.azurewebsites.net/docs/LeucippusExamples.pdf" target="_blank" >Leucippus Examples</a>
+
+
 
 {% endblock content %}
 

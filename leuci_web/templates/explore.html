@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}
 explore
 {% endblock title %}
 
 {% block content %}
-<h2>Explore Pdb Code Density Map: {{ pdb_code }} </h2>
+<h2>Explore Pdb Code Density Map: <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
 <h3>{{ message }} </h3>
 <hr/>
 <table style="text-align:left;border-width:2px !important;">
@@ -203,15 +205,8 @@ explore
                     <a href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php" target = "_blank">EM Map Info</a> 
                 </span>
                 <br/>
-                <textarea cols="50" rows="20">{{header_string}}</textarea>
-
-                <!--<ul style="background-color:whitesmoke;">
-                    {% for key, value in map_header.items %} 
-                      <li>{{key}} - {{value}}</li>
-                    {% endfor %}
-                </ul>-->
-                                                                                                
-                
+                <textarea cols="50" rows="15">{{header_string}}</textarea>
+                                                                                                                              
             </div>           
         </td>
     </tr>
