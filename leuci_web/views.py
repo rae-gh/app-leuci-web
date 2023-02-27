@@ -263,35 +263,33 @@ async def explore(request):
     
     context["full_url"] = await sd.get_url(request, ["pdb_code"])    
     gl_user, gl_ip = await get_user(request)            
-    pdb_code, in_store,exists, ready, mload = await sd.get_pdbcode(request)
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)
     if pdb_code == "":
         return render(request, 'explore.html', context)
-    print(pdb_code, in_store,exists, ready)        
+    print(pdb_code, on_file, in_loader, in_interp)        
     context['pdb_code'] = pdb_code    
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
-    if not in_store:
-        if not exists:
-            context['ebi_link'] = mload.mobj.ebi_link
-            context['message'] = "Downloading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                
-            return render(request, 'explore.html', context)
-        else:                                
-            mload = await sd.load_mapheader(request,pdb_code,mload)
-            # get the actual values asynchronously as they take forever
-            loop2 = asyncio.get_event_loop()
-            async_function2 = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            loop2.create_task(async_function2(request,pdb_code,gl_ip))                
-                                            
-    my_pdb = mload.mobj
-    #print(my_pdb)
-    context['resolution'] = my_pdb.resolution
-    context['ebi_link'] = my_pdb.ebi_link
-    context['exp_method'] = my_pdb.exp_method            
-    if "x-ray" in my_pdb.exp_method:        
-        context['header_string'] = my_pdb.header_as_string            
-    print("rendering...")
+    
+    if not on_file:
+        context['message'] = "Downloading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+        loop.create_task(async_function(request,pdb_code,gl_ip))                                                                
+        return render(request, 'explore.html', context)
+    elif not in_interp or not in_loader :
+        context['message'] = "Uploading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        loop.create_task(async_function(request,pdb_code,gl_ip))
+                                
+    if mobj != None:        
+        print(mobj)
+        context['resolution'] = mobj.resolution
+        context['ebi_link'] = mobj.ebi_link
+        context['exp_method'] = mobj.exp_method            
+        if "x-ray" in mobj.exp_method:        
+            context['header_string'] = mobj.header_as_string            
+        print("rendering...")
     return render(request, 'explore.html', context)
                         
 async def admin(request):
@@ -301,7 +299,7 @@ async def admin(request):
     
     context = {}
     gl_user, gl_ip = await get_user(request)
-    pdb_code, in_store,exists, ready, mload = await sd.get_pdbcode(request)
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)
     adm_fetch = adm.AdminClass()    
     log_all = False
     if act == "data_show2":
@@ -330,39 +328,17 @@ async def projection(request):
     context["full_url"] = await sd.get_url(request, ["pdb_code"])
     context['message'] = ""
     # we should already have loaded this asynchronously, too late now if we haven't
-    gl_user, gl_ip = await get_user(request)    
-    pdb_code, in_store, exists, ready_header, mload = await sd.get_pdbcode(request)            
-    context['pdb_code'] = pdb_code    
-    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')
-    context["value_check"] = -1
-    context["value_len"] = -1
-    if not in_store:
-        if not exists:
-            context['message'] = "Downloading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                        
-        elif ready_header:
-            context['message'] = "Uploading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-        else:
-            context['message'] = "Uploading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    else:                                
-        if len(mload.mobj.values) > 0:
-            context["value_check"] = mload.mobj.values[0]
-            context["value_len"] = len(mload.mobj.values)
-                    
+    gl_user, gl_ip = await get_user(request)        
+    context['pdb_code'] = "dummy"
+    logging.info("INFO:\t" + gl_ip + "\t" + "dummy" + ' projection at '+str(datetime.datetime.now())+' hours')
+    context["value_check"] = 0
+    context["value_len"] = 0                        
     xy = [  [1,2,3,4,5],
-            [6,7,8,9,10],
-            [0.2,3,8,9,1],
-            [0.2,2,2,2,1],
-            [0,1,1,1,-2]] 
-        
+        [6,7,8,9,10],
+        [0.2,3,8,9,1],
+        [0.2,2,2,2,1],
+        [0,1,1,1,-2]] 
+
     from .classes import plotter
     context["plot_div1"] = plotter.makeContour(xy)
     context["plot_div2"] = plotter.makeHeatmap(xy)
@@ -374,44 +350,44 @@ async def projection(request):
 async def slice(request):
     context = {}
     context["full_url"] = await sd.get_url(request, ["pdb_code"])
-    context['message'] = ""
-    # we should already have loaded this asynchronously, too late now if we haven't
+    context['message'] = ""    
     gl_user, gl_ip = await get_user(request)    
-    pdb_code, in_store, exists, ready_header, mload = await sd.get_pdbcode(request)            
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)            
     context['pdb_code'] = pdb_code    
+    if pdb_code == "":
+        context['message'] = "Please select a pdb code"   
+        return render(request, 'explore.html', context) #return back to choose page
+
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice at '+str(datetime.datetime.now())+' hours')
     context["value_check"] = -1
     context["value_len"] = -1
-    if not in_store:
-        if not exists:
-            context['message'] = "Downloading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                        
-        elif ready_header:
-            context['message'] = "Uploading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-        else:
-            context['message'] = "Uploading... "        
-            loop = asyncio.get_event_loop()
-            async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    else:                                
-        if len(mload.mobj.values) > 0:
-            context["value_check"] = mload.mobj.values[0]
-            context["value_len"] = len(mload.mobj.values)
+    context["density_mat"] = [[]]
+    context["radient_mat"] = [[]]
+    context["laplacian_mat"] = [[]]
+    if not on_file:
+        context['message'] = "Downloading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+        loop.create_task(async_function(request,pdb_code,gl_ip))                                                                
+    elif not in_interp or not in_loader :
+        context['message'] = "Uploading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    else: # then it is in store                                      
+        if len(mobj.values) > 0:
+            context["value_check"] = mobj.values[0]
+            context["value_len"] = len(mobj.values)
                     
-    xy = [  [1,2,3,4,5],
-            [6,7,8,9,10],
-            [0.2,3,8,9,1],
-            [0.2,2,2,2,1],
-            [0,1,1,1,-2]] 
-            
-    context["density_mat"] = xy
-    context["radient_mat"] = xy
-    context["laplacian_mat"] = xy
+            xy = [  [1,2,3,4,5],
+                [6,7,8,9,10],
+                [0.2,3,8,9,1],
+                [0.2,2,2,2,1],
+                [0,1,1,1,-2]] 
+                
+            context["density_mat"] = xy
+            context["radient_mat"] = xy
+            context["laplacian_mat"] = xy
         
     print("rendering...")
     return render(request, 'slice.html', context)

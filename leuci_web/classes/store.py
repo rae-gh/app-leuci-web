@@ -11,8 +11,10 @@ import datetime
 class Store:
     _instance = None
     _lock = threading.Lock()
-    strge = {}
-    strge_dates = {}
+    strge_loader = {}
+    strge_loader_dates = {}
+    strge_interper = {}
+    strge_interper_dates = {}
     
     def __new__(cls):
         if not cls._instance:  # This is the only difference
@@ -21,23 +23,43 @@ class Store:
                     cls._instance = super().__new__(cls)
         return cls._instance
                         
-    def exists(cls,pdb_code):
-        return pdb_code in cls.strge
-    
-    def get(cls,pdb_code):
-        dt = cls.strge_dates[pdb_code]
-        return cls.strge[pdb_code],dt
-    
-    def add(cls,pdb_code, map_obj):        
-        cls.strge[pdb_code] = map_obj
-        cls.strge_dates[pdb_code] = datetime.datetime.now()
+    ## LOADER ##
+    def exists_loader(cls,pdb_code):
+        return pdb_code in cls.strge_loader    
+    def get_loader(cls,pdb_code):
+        dt = cls.strge_loader_dates[pdb_code]
+        lo = cls.strge_loader[pdb_code]
+        return lo,dt    
+    def add_loader(cls,pdb_code, map_obj):        
+        cls.strge_loader[pdb_code] = map_obj
+        cls.strge_loader_dates[pdb_code] = datetime.datetime.now()
+
+    ## Interper ##
+    def exists_interper(cls,pdb_code):
+        return pdb_code in cls.strge_interper    
+    def get_interper(cls,pdb_code):
+        dt = cls.strge_interper_dates[pdb_code]
+        lo = cls.strge_interper[pdb_code]
+        return lo,dt    
+    def add_interper(cls,pdb_code, map_obj):        
+        cls.strge_interper[pdb_code] = map_obj
+        cls.strge_interper_dates[pdb_code] = datetime.datetime.now()
             
     def clear(cls):
-        cls.strge.clear()
-        cls.strge_dates.clear()
+        cls.strge_loader.clear()
+        cls.strge_loader_dates.clear()
+        cls.strge_interper.clear()
+        cls.strge_interper_dates.clear()
+
+    def print_interpers(cls):
+        ret_text = ""            
+        for pdb_code,map_fun in cls.strge_interper.items():        
+            ret_text += "\n" + pdb_code + "\t" + map_fun.mobj.header_as_string[:30] + "\n"                    
+            if len(map_fun.mobj.values) > 0:
+                dt = cls.strge_interper_dates[pdb_code]
+                ret_text += "vals=" + str(len(map_fun.mobj.values)) + "\t\t"
+                ret_text += str(dt) + "\n"
+        return ret_text
+
                     
-    def storage(cls):
-        return cls.strge
     
-    def storage_dates(cls):
-        return cls.strge_dates

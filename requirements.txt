@@ -7,4 +7,6 @@ whitenoise
 matplotlib
 pandas
 biopython
-leuci-lib
+leuci-xyz
+leuci-pol
+leuci-map
