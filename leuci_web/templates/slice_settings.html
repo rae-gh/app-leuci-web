@@ -1,4 +1,4 @@
-{% extends 'base_explore_slice.html' %}
+{% extends 'base_explore.html' %}
 
 {% load static %}
 
@@ -10,6 +10,39 @@ slice
 
 <h2>Settings for <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
 <h3>{{ message }} </h3>
+<form method="post" action="slice" style="padding:2px !important;margin:0px !important">
+    {% csrf_token %}
+<table>    
+    <tr>        
+        <td style="width:10%;">Width(A)</td>
+        <td><input id="width" value="{{ width }}" name="width"/></td>        
+    </tr>
+    <tr>
+        <td style="width:10%">Samples</td>
+        <td><input id="samples" value="{{ samples }}" name="samples"/></td>        
+    </tr>
+    <tr>
+        <td style="width:10%">Interpolation</td>
+        <td><input id="interp" value="{{ interp }}" name="interp"/></td>        
+    </tr>    
+</table>
+<h3>Current values stored</h3>
+<table>    
+    <tr>        
+        <td style="width:10%;">Central</td>
+        <td>{{ central }}</td>        
+    </tr>
+    <tr>
+        <td style="width:10%">Linear</td>
+        <td>{{ linear }}</td>        
+    </tr>
+    <tr>
+        <td style="width:10%">Planar</td>
+        <td>{{ planar }}</td>        
+    </tr>    
+</table>
+<button type="submit">update</button>        
+</form>
 
 {% endblock content%}
 

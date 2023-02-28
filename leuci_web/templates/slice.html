@@ -1,4 +1,4 @@
-{% extends 'base_explore_slice.html' %}
+{% extends 'base_explore.html' %}
 
 {% load static %}
 
@@ -14,52 +14,120 @@ slice
 <h3>{{ message }} </h3>
 <form method="post" action="slice" style="padding:2px !important;margin:0px !important">
     {% csrf_token %}            
-<table>
-    <tr>
-        <td>
-            <table>    
+<table style="padding:10px !important; align-content:center !important; text-align:center !important;" onMouseOver="button.backgroundColor='#F8F8F8'" onMouseOut="button.backgroundColor='#FFFFFF'">
+    <tr style="padding:10px !important">    
+        <td width="15%" style="padding:10px !important">    
+             <!-- JOY STICK OBJECT -->
+        <div id="joystick" style="width:100%;text-align:center;align-content:center">            
+            <div>                                    
+                <label style="width:100%;align-content:center">
+                <input style="visibility:hidden;height:0px;width:0px;margin:0px;padding:0px;display:none" type="submit" name="image" value="x">
+                    <svg width="100%" height="100%" viewBox="0 0 100 100" style="text-align:center;">
+                    <defs>
+                    <linearGradient id="grad1b" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(16,16,16);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(240,240,240);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad2b" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(240,240,240);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(16,16,16);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad3b" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgb(168,168,168);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(239,239,239);stop-opacity:1" />
+                    </linearGradient>
+                    </defs>
+
+                    <circle cx="50" cy="50" r="38" fill="url(#grad1b)" />
+                    <circle cx="50" cy="50" r="38" fill="url(#grad2b)" stroke="black" stroke-width="1.5px" />
+                    <circle cx="50" cy="50" r="38" fill="url(#grad3b)" />
+                    <circle cx="50" cy="50" r="20" fill="#cccccc" stroke="black" stroke-width="2px" />
+
+                    <path onclick="NavPressed('B:TO')" style="cursor:pointer" d="M50,0 54,8 46,8Z" fill="rgba(0,0,0,0.8)"><title>tilt over</title></path>
+                    <path onclick="NavPressed('B:UP')" style="cursor:pointer" d="M50,14 54,22 46,22Z" fill="rgba(0,0,0,0.8)"><title>up</title></path>                        
+                    <path onclick="NavPressed('B:DN')" style="cursor:pointer" d="M50,86 54,78 46,78Z" fill="rgba(0,0,0,0.8)"><title>down</title></path>
+                    <path onclick="NavPressed('B:TU')" style="cursor:pointer" d="M50,100 54,92 46,92Z" fill="rgba(0,0,0,0.8)"><title>tilt under</title></path>
+                    <path onclick="NavPressed('B:LE')" style="cursor:pointer" d="M14,50 22,54 22,46Z" fill="rgba(0,0,0,0.8)"><title>left</title></path>
+                    <path onclick="NavPressed('B:TL')" style="cursor:pointer" d="M0,50 8,54 8,46Z" fill="rgba(0,0,0,0.8)"><title>tilt left</title></path>
+                    <path onclick="NavPressed('B:RI')" style="cursor:pointer" d="M86,50 78,54 78,46Z" fill="rgba(0,0,0,0.8)"><title>right</title></path>
+                    <path onclick="NavPressed('B:TR')" style="cursor:pointer" d="M100,50 92,54 92,46Z" fill="rgba(0,0,0,0.8)"><title>tilt right</title></path>
+                    <path onclick="NavPressed('B:AC')" style="cursor:pointer" d="M20,20 15,15 10,25Z" fill="rgba(0,0,0,0.8)"><title>anti-clockwise</title></path>
+                    <path onclick="NavPressed('B:CL')" style="cursor:pointer" d="M80,20 85,15 90,25Z" fill="rgba(0,0,0,0.8)"><title>clockwise</title></path>
+                    <clipPath id="cut-offb">
+                    <rect x="0" y="0" width="70" height="50"/>
+                    </clipPath>
+                    <circle onclick="NavPressed('B:BA')" style="cursor:pointer" cx="50" cy="50" r="20" fill="darkseagreen"><title>back</title></circle>
+                    <circle onclick="NavPressed('B:FW')" style="cursor:pointer" cx="50" cy="50" r="20" fill="lightseagreen" clip-path="url(#cut-offb)"><title>fwd</title></circle>
+                </svg>                        
+                </label>                    
+            </div>                                                         
+        </div>
+        <!-- UN-JOY STICK OBJECT -->
+        </td>
+        <td style="padding:10px !important">    
+            <table style="padding:10px !important">    
+                <tr style="padding:10px !important">    
+                    <th>
+                        <a href='https://www.ebi.ac.uk/pdbe/entry-files/pdb{{pdb_code}}.ent' target="_blank">Browse atoms</a>
+                    </th>                                        
+                    <td><button class="button button1"  type="submit">Update (x,y,z)</button></td>
+                    <th>aa</th>
+                    <td>                        
+                        <button class="button button1" type="submit"><<</button>
+                        <button class="button button1" type="submit">Update atoms</button>
+                        <button class="button button1" type="submit">>></button>
+                    </td>
+                    <th></th>
+                </tr>
                 <tr>
                     <th>Central</th>
-                    <th>Linear</th>
-                    <th>Planar</th>                    
+                    <td><input id="central" value="{{ central }}" name="central"/></td>        
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td><input id="central" value="{{ central }}" name="central"/></td>        
+                    <th>Linear</th>
                     <td><input id="linear" value="{{ linear }}" name="linear"/></td>                    
-                    <td><input id="planar" value="{{ planar }}" name="planar"/></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
-                
+                <tr>
+                    <th>Planar</th>                    
+                    <td><input id="planar" value="{{ planar }}" name="planar"/></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    
+                </tr>                        
             </table>
         </td>    
-        <td>
-            <table>
-                <tr>        
-                    <td style="width:10%;">Floor%</td>
-                    <td style="width:60%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>
-                </tr>
-                <tr>
-                    <td style="width:10%">Cap%</td>
-                    <td style="width:60%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
-                </tr>
-            </table>    
-        </td>        
-        <td>
-            <tr>        
-                <td style="width:10%;">Width(A)</td>
-                <td><input id="width" value="{{ width }}" name="width"/></td>        
-            </tr>
-            <tr>
-                <td style="width:10%">Samples</td>
-                <td><input id="samples" value="{{ samples }}" name="samples"/></td>        
-            </tr>
-        </td>
+        <td>            
+        </td>                
     </tr>
 </table>
-<br/>
 
-    <input type="text" id="action" name="action" value="refresh" style="width:0px;visibility:hidden;">
-    <button type="submit">refresh</button>
-</form>                      
+</form>
+<hr/>
+<form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
+    {% csrf_token %}
+    <p style="display:none;visibility:collapse">        
+        <input id="width" value="{{ width }}" name="width"/>
+        <input id="samples" value="{{ samples }}" name="samples"/>
+        <input id="interp" value="{{ interp }}" name="interp"/>
+        <input id="central" value="{{ central }}" name="central"/>
+        <input id="linear" value="{{ linear }}" name="linear"/>
+        <input id="planar" value="{{ planar }}" name="planar"/>
+    </p>
+    <button class="button button1" type="submit">calculation settings</button>        
+</form>
 <hr/>
 <table width="1200px">    
     <tr>
@@ -69,23 +137,37 @@ slice
     </tr>
     <tr>
         <td>
-            <button onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
-            <button onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
-            <button onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>
+            <button class="button button1" onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
+            <button class="button button1" onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
+            <button class="button button1" onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>
             
         </td>        
         <td>
-            <button onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
-            <button onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
-            <button onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
+            <button class="button button1" onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
+            <button class="button button1" onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
+            <button class="button button1" onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
             
         </td>        
         <td>
-            <button onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
-            <button onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
-            <button onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
+            <button class="button button1" onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
+            <button class="button button1" onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
+            <button class="button button1" onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
         </td>        
-    </tr>    
+    </tr> 
+    <tr>
+        <td>
+            <table>
+                <tr>        
+                    <td style="width:10%;">Floor%</td>
+                    <td style="width:40%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>                
+                    <td style="width:10%">Cap%</td>
+                    <td style="width:40%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
+                </tr>
+            </table>    
+        </td>
+        <td></td>
+        <td></td>
+    </tr>   
     <tr>
         <td><div id="slice_density" style="width:100%"></div></td>            
         <td><div id="slice_radient" style="width:100%"></div></td>            
@@ -94,14 +176,9 @@ slice
 </table>
 <p>
     {{value_len}}
-    <br/>{{value_check}}
-    <br/>{{interp}}
-    <br/>{{central}}
-    <br/>{{linear}}
-    <br/>{{planar}}
-    <br/>{{width}}
-    <br/>{{samples}}
+    {{value_check}}
 </p>
+<!-- hiden values for the javascript display-->
 <p style="display:none;visibility:collapse">
     <!-- HIDDEN VALUES -->
     <input id="den_plot_name" value='contour' name="den_plot_name"/>

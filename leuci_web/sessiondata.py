@@ -109,31 +109,38 @@ def get_store_info(gl_ip):
     return stre.print_interpers
 
 @sync_to_async
-def get_slice_view_info(request):
+def get_slice_settings(request):
     """
     Returns pdb info from current state or downloads from the ebi
     """
-    interp, central, linear, planar, width, samples = "nearest", "(0,0,0)","(2,2,2)","(2,2,2)" ,5,20
+    refresh, settings = False,False
+    width, samples, interp, central, linear, planar = 6,20,"linear","(0,0,0)","(0,0,0)","(0,0,0)"
+
+    ret_dic = {}
     
     req_store = request.POST
-    if 'pdb_code' in request.POST:
-        req_store = request.GET
-        
-    if "interp" in req_store:
-        interp = req_store.get("interp").lower()
-    if "central" in req_store:
-        central = req_store.get("central").lower()
-    if "linear" in req_store:
-        linear = req_store.get("linear").lower()
-    if "planar" in req_store:
-        planar = req_store.get("planar").lower()
-    if "width" in req_store:
-        width = int(req_store.get("width"))
+    if 'width' in request.POST:
+        width = int(req_store.get('width').lower())
     if "samples" in req_store:
-        samples = int(req_store.get("samples"))
-         
-    return interp, central, linear, planar, width, samples
+        samples = int(req_store.get('samples').lower())
+    if "interp" in req_store:
+        interp = req_store.get('interp').lower()
+    if "central" in req_store:
+        central = req_store.get('central').lower()
+    if "linear" in req_store:
+        linear = req_store.get('linear').lower()
+    if "planar" in req_store:
+        planar = req_store.get('planar').lower()
     
+    ret_dic["width"] = width
+    ret_dic["samples"] = samples
+    ret_dic["interp"] = interp
+    ret_dic["central"] = central
+    ret_dic["linear"] = linear
+    ret_dic["planar"] = planar
+    
+    return ret_dic
+
     
                 
             

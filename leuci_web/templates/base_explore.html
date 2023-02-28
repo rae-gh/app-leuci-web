@@ -11,7 +11,32 @@
         {% endblock %}
     </title>        
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>    
-    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>    
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <style>
+    .button {
+        background-color: cornflowerblue; 
+        border: none;
+        color: white;
+        padding: 5px 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 2px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+      }      
+      .button1 {
+        background-color: oldlace; 
+        color: cornflowerblue;         
+      }
+      .button1:hover {
+        background-color: cornflowerblue;
+        color: white;
+       }
+    </style>
+      
 </head>
 
 <body>    
@@ -37,7 +62,13 @@
             <ul class="navbar-nav ml-auto">                
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'explore' %}" style="font-family:verdana !important; background-color: rgba(238, 79, 110, 0.744) !important;">Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="" style="font-family:verdana !important;">Compare</a>
                 </li>                
+                <li class="nav-item">
+                    <a class="nav-link" href="" style="font-family:verdana !important;">Superpose</a>
+                </li>                       
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'about' %}" style="font-family:verdana !important;">About</a>
                 </li>                

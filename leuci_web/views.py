@@ -154,7 +154,7 @@ async def slice(request):
     context = {}
     context["full_url"] = await sd.get_url(request, ["pdb_code"])
     context['message'] = ""    
-    gl_user, gl_ip = await get_user(request)    
+    gl_user, gl_ip = await get_user(request)            
     pdb_code, on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
     context['pdb_code'] = pdb_code    
     if pdb_code == "":
@@ -185,21 +185,17 @@ async def slice(request):
     else: # then it is in store        
         mobj = mfunc.mobj
         if len(mobj.values) > 0:
-            interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_view_info(request)
-            print(interp, centralstr, linearstr, planarstr, width, samples)
+            settings_dic = await sd.get_slice_settings(request)
+            for name, val in settings_dic.items():
+                context[name] = val
+            interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_settings(request)
             context["value_check"] = mobj.values[0]
-            context["value_len"] = len(mobj.values)
-            context["interp"] = interp
-            context["central"] = centralstr
-            context["linear"] = linearstr
-            context["planar"] = planarstr
-            context["width"] = width
-            context["samples"] = samples
+            context["value_len"] = len(mobj.values)                        
             import leuci_xyz.vectorthree as v3            
-            central = v3.VectorThree().from_coords(centralstr)
-            linear = v3.VectorThree().from_coords(linearstr)
-            planar = v3.VectorThree().from_coords(planarstr)                        
-            vals = mfunc.get_slice(central,linear,planar,width,samples)
+            central = v3.VectorThree().from_coords(settings_dic["central"])
+            linear = v3.VectorThree().from_coords(settings_dic["linear"])
+            planar = v3.VectorThree().from_coords(settings_dic["planar"])         
+            vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]))
             #print(vals)
                     
             #xy = [  [1,2,3,4,5],
@@ -235,6 +231,10 @@ async def slice_settings(request):
     gl_user, gl_ip = await get_user(request)    
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice settings at '+str(datetime.datetime.now())+' hours')
     print("rendering...")
+    settings_dic = await sd.get_slice_settings(request)            
+    for name, val in settings_dic.items():
+        context[name] = val
+
     return render(request, 'slice_settings.html', context)
         
         
