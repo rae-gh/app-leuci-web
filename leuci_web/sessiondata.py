@@ -34,11 +34,11 @@ def get_url(request,items):
     return full_url[:-1]
 
 @sync_to_async
-def get_pdbcode(request):
+def get_pdbcode_and_status(request, ret="DATA"):
     """
     Returns pdb info from current state or downloads from the ebi
     """
-    pdb_code,on_file, in_loader, in_interp,mobj = "", True,False,False,None
+    pdb_code,on_file, in_loader, in_interp,mobj, mfunc = "", True,False,False,None,None
     current_code = ""
     if 'pdb_code' in request.POST:
         pdb_code = request.POST.get('pdb_code').lower()        
@@ -57,8 +57,8 @@ def get_pdbcode(request):
     
     in_interp = stre.exists_interper(pdb_code)
     if in_interp:
-        mfun,dt = stre.get_interper(pdb_code)
-        mobj = mfun.mobj
+        mfunc,dt = stre.get_interper(pdb_code)
+        mobj = mfunc.mobj
 
     if not in_loader:
         mload = moad.MapLoader(pdb_code, directory=DIR, cif=False)
@@ -71,7 +71,10 @@ def get_pdbcode(request):
             
     #return pdb_code, in_store,exists, mload
     request.session['pdb_code'] = pdb_code        
-    return pdb_code, on_file, in_loader, in_interp,mobj
+    if ret == "FUNC":
+        return pdb_code, on_file, in_loader, in_interp,mfunc
+    else:
+        return pdb_code, on_file, in_loader, in_interp,mobj
 
                    
 def download_ed(request,pdb_code,gl_ip):    
@@ -104,4 +107,35 @@ def get_interper(pdb_code):
 def get_store_info(gl_ip):        
     stre = stor.Store()
     return stre.print_interpers
+
+@sync_to_async
+def get_slice_view_info(request):
+    """
+    Returns pdb info from current state or downloads from the ebi
+    """
+    interp, central, linear, planar, width, samples = "nearest", "(0,0,0)","(2,2,2)","(2,2,2)" ,5,20
+    
+    req_store = request.POST
+    if 'pdb_code' in request.POST:
+        req_store = request.GET
+        
+    if "interp" in req_store:
+        interp = req_store.get("interp").lower()
+    if "central" in req_store:
+        central = req_store.get("central").lower()
+    if "linear" in req_store:
+        linear = req_store.get("linear").lower()
+    if "planar" in req_store:
+        planar = req_store.get("planar").lower()
+    if "width" in req_store:
+        width = int(req_store.get("width"))
+    if "samples" in req_store:
+        samples = int(req_store.get("samples"))
+         
+    return interp, central, linear, planar, width, samples
+    
+    
+                
+            
+    
     

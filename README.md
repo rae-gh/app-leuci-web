@@ -18,6 +18,7 @@ pip install -r requirements.txt
 ```
 python manage.py runserver
 uvicorn project.asgi:application
+uvicorn project.asgi:application --reload
 
 ```
 http://127.0.0.1:8000/

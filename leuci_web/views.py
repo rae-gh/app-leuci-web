@@ -27,201 +27,6 @@ def index(request):
 def about(request):
     return render(request,'about.html')
 
-def destinations(request):
-    all_destinations = []
-    all_cruises = []
-    return render(request, 'destinations.html',{'destinations':all_destinations,'cruises':all_cruises})
-
-###################################################################
-### Testing for demo broken links ###
-def broken(request):
-    return render(request,'brokens.html')
-
-@csrf_exempt
-def broken0(request):
-    return rachelPlot(request)
-
-####################################################################
-@csrf_exempt
-def plotly(request):
-    # https://albertrtk.github.io/2021/01/24/Graph-on-a-web-page-with-Plotly-and-Django.html
-    """
-    View demonstrating how to display a graph object
-    on a web page with Plotly.
-    """
-    from django.shortcuts import render
-    from plotly.offline import plot
-    import plotly.graph_objects as go
-    # Generating some data for plots.
-    x = [i for i in range(-10, 11)]
-    y1 = [3*i for i in x]
-    y2 = [i**2 for i in x]
-    y3 = [10*abs(i) for i in x]
-    # List of graph objects for figure.
-    # Each object will contain on series of data.
-    graphs = []
-    # Adding linear plot of y1 vs. x.
-    graphs.append(
-        go.Scatter(x=x, y=y1, mode='lines', name='Line y1')
-    )
-    # Adding scatter plot of y2 vs. x.
-    # Size of markers defined by y2 value.
-    graphs.append(
-        go.Scatter(x=x, y=y2, mode='markers', opacity=0.8,
-        marker_size=y2, name='Scatter y2')
-    )
-    # Adding bar plot of y3 vs x.
-    graphs.append(
-        go.Bar(x=x, y=y3, name='Bar y3')
-    )
-    # Setting layout of the figure.
-    layout = {
-        'title': 'Title of the figure',
-        'xaxis_title': 'X',
-        'yaxis_title': 'Y',
-        'height': 420,
-        'width': 560,
-    }
-    # Getting HTML needed to render the plot.
-    plot_div = plot({'data': graphs, 'layout': layout}, output_type='div')
-    return render(request, 'plotly.html',context={'plot_div': plot_div})
-
-@csrf_exempt
-def matplotlib(request):    
-    import matplotlib.pyplot as plt
-    import io
-    import base64    
-    name = request.POST.get('name')     
-    fig, ax = plt.subplots(figsize=(10,4))
-    ax.plot([1, 2, 3, 4], [1, 4, 2, 3])    
-    flike = io.BytesIO()
-    plt.savefig(flike)
-    b64 = base64.b64encode(flike.getvalue()).decode()    
-    context = {'wind_rose': b64,'name': name }            
-    return render(request, 'matplotlib.html', context)
-    
-### Brokens  ############################################################
-@csrf_exempt
-def rachelPlot(request):    
-    import matplotlib.pyplot as plt
-    import io
-    import base64    
-    if 'name' in request.POST:
-        name = request.POST.get('name')     
-    else:
-        name=""
-    fig, ax = plt.subplots(figsize=(5,2))    
-    data = pd.read_csv("leuci_web/static/res/data/notch1_3l95_ddg_background.csv")
-    x = data['pdb_rid']
-    y = data['ddg']
-    ax.plot(x,y)   
-    flike = io.BytesIO()
-    plt.savefig(flike)
-    b64 = base64.b64encode(flike.getvalue()).decode()    
-    context = {'wind_rose': b64,'name': name }            
-    return render(request, 'broken0.html', context)
-
-
-# ASYNC STUFF ############################################################################################
-# helpers
-async def http_call_async():
-    for num in range(1, 6):
-        await asyncio.sleep(1)
-        print(num)
-    async with httpx.AsyncClient() as client:
-        r = await client.get("https://httpbin.org/")
-        print(r)
-
-
-def http_call_sync():
-    for num in range(1, 6):
-        sleep(1)
-        print(num)
-    r = httpx.get("https://httpbin.org/")
-    print(r)
-
-
-
-
-async def get_smokables():
-    print("Getting smokeables...")
-
-    await asyncio.sleep(2)
-    async with httpx.AsyncClient() as client:
-        await client.get("https://httpbin.org/")
-
-        print("Returning smokeable")
-        return [
-            "ribs",
-            "brisket",
-            "lemon chicken",
-            "salmon",
-            "bison sirloin",
-            "sausage",
-        ]
-
-
-async def get_flavor():
-    print("Getting flavor...")
-
-    await asyncio.sleep(1)
-    async with httpx.AsyncClient() as client:
-        await client.get("https://httpbin.org/")
-
-        print("Returning flavor")
-        return random.choice(
-            [
-                "Sweet Baby Ray's",
-                "Stubb's Original",
-                "Famous Dave's",
-            ]
-        )
-
-
-def oversmoke() -> None:
-    """ If it's not dry, it must be uncooked """
-    sleep(5)
-    print("Who doesn't love burnt meats?")
-
-# views
-async def async_view(request):
-    loop = asyncio.get_event_loop()
-    loop.create_task(http_call_async())
-    return HttpResponse("Non-blocking HTTP request")
-
-
-def sync_view(request):
-    http_call_sync()
-    return HttpResponse("Blocking HTTP request")
-
-
-async def smoke(smokables: List[str] = None, flavor: str = "Sweet Baby Ray's") -> List[str]:
-    """ Smokes some meats and applies the Sweet Baby Ray's """
-
-    for smokable in smokables:
-        print(f"Smoking some {smokable}...")
-        print(f"Applying the {flavor}...")
-        print(f"{smokable.capitalize()} smoked.")
-
-    return len(smokables)
-
-async def smoke_some_meats(request):
-    results = await asyncio.gather(*[get_smokables(), get_flavor()])
-    total = await asyncio.gather(*[smoke(results[0], results[1])])
-    return HttpResponse(f"Smoked {total[0]} meats with {results[1]}!")
-
-
-async def burn_some_meats(request):
-    oversmoke()
-    return HttpResponse(f"Burned some meats.")
-
-
-async def async_with_sync_view(request):
-    loop = asyncio.get_event_loop()
-    async_function = sync_to_async(http_call_sync, thread_sensitive=False)
-    loop.create_task(async_function())
-    return HttpResponse("Non-blocking HTTP request (via sync_to_async)")
-
 #####################################################################################################################################
 
 from pathlib import Path
@@ -231,8 +36,6 @@ from django.http import JsonResponse
 from asgiref.sync import async_to_sync, sync_to_async
 
 DIR = str(Path(__file__).resolve().parent )+ "/data/"
-
-
 
 @sync_to_async
 def get_user(request):
@@ -263,7 +66,7 @@ async def explore(request):
     
     context["full_url"] = await sd.get_url(request, ["pdb_code"])    
     gl_user, gl_ip = await get_user(request)            
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
     if pdb_code == "":
         return render(request, 'explore.html', context)
     print(pdb_code, on_file, in_loader, in_interp)        
@@ -299,7 +102,7 @@ async def admin(request):
     
     context = {}
     gl_user, gl_ip = await get_user(request)
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
     adm_fetch = adm.AdminClass()    
     log_all = False
     if act == "data_show2":
@@ -352,7 +155,7 @@ async def slice(request):
     context["full_url"] = await sd.get_url(request, ["pdb_code"])
     context['message'] = ""    
     gl_user, gl_ip = await get_user(request)    
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode(request)            
+    pdb_code, on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
     context['pdb_code'] = pdb_code    
     if pdb_code == "":
         context['message'] = "Please select a pdb code"   
@@ -374,22 +177,64 @@ async def slice(request):
         loop = asyncio.get_event_loop()
         async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
         loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    else: # then it is in store                                      
+    elif mfunc == None:
+        context['message'] = "Uploading... "        
+        loop = asyncio.get_event_loop()
+        async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    else: # then it is in store        
+        mobj = mfunc.mobj
         if len(mobj.values) > 0:
+            interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_view_info(request)
+            print(interp, centralstr, linearstr, planarstr, width, samples)
             context["value_check"] = mobj.values[0]
             context["value_len"] = len(mobj.values)
+            context["interp"] = interp
+            context["central"] = centralstr
+            context["linear"] = linearstr
+            context["planar"] = planarstr
+            context["width"] = width
+            context["samples"] = samples
+            import leuci_xyz.vectorthree as v3            
+            central = v3.VectorThree().from_coords(centralstr)
+            linear = v3.VectorThree().from_coords(linearstr)
+            planar = v3.VectorThree().from_coords(planarstr)                        
+            vals = mfunc.get_slice(central,linear,planar,width,samples)
+            #print(vals)
                     
-            xy = [  [1,2,3,4,5],
-                [6,7,8,9,10],
-                [0.2,3,8,9,1],
-                [0.2,2,2,2,1],
-                [0,1,1,1,-2]] 
+            #xy = [  [1,2,3,4,5],
+            #    [6,7,8,9,10],
+            #    [0.2,3,8,9,1],
+            #    [0.2,2,2,2,1],
+            #    [0,1,1,1,-2]] 
+
+            #print(xy)
                 
-            context["density_mat"] = xy
-            context["radient_mat"] = xy
-            context["laplacian_mat"] = xy
+            context["density_mat"] = vals
+            context["radient_mat"] = vals
+            context["laplacian_mat"] = vals
         
     print("rendering...")
     return render(request, 'slice.html', context)
+
+    
+
+async def slice_settings(request):
+    """
+    The plan for this is it hides all menus and forces the user to return to the view page
+    after slecting some settings
+    That way all settings are passed in a get-post, sent to slice and stored back in the page
+    """
+    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
+    context = {}
+    context['pdb_code'] = pdb_code    
+    if pdb_code == "":
+        context['message'] = "Please select a pdb code"   
+        return render(request, 'explore.html', context) #return back to choose page
+
+    gl_user, gl_ip = await get_user(request)    
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice settings at '+str(datetime.datetime.now())+' hours')
+    print("rendering...")
+    return render(request, 'slice_settings.html', context)
         
         

@@ -21,22 +21,32 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
             aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
-        </button>
-
+        </button>                
+        <div class="collapse navbar-collapse" id="mainNavbar">            
+            <ul class="navbar-nav ml-auto">                                              
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'slice' %}" style="font-family:verdana !important;">Slice</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'projection' %}" style="font-family:verdana !important;">Projection</a>
+                </li>                                                
+            </ul>
+        </div>
+        <br/>
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav ml-auto">                
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'explore' %}" style="font-family:verdana !important;">Explore</a>
+                    <a class="nav-link" href="{% url 'explore' %}" style="font-family:verdana !important; background-color: rgba(238, 79, 110, 0.744) !important;">Explore</a>
                 </li>                
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'about' %}" style="font-family:verdana !important;">About</a>
                 </li>                
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'admin' %}" style="font-family:verdana !important;">Admin</a>
-                </li>                
-                
+                </li>                                
             </ul>
         </div>
+        
     </nav>
 
     <main role="main">

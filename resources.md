@@ -12,3 +12,6 @@ https://html-color.codes/
 
 ## Plotly
 https://plotly.com/python-api-reference/generated/plotly.graph_objects.Contour.html?highlight=contour#plotly.graph_objects.Contour
+
+## Async
+https://testdriven.io/blog/django-async-views/

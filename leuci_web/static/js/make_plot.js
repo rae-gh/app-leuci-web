@@ -39,15 +39,10 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax){
     }else{
       cs_scl = cs_scl_br;
     }
-      
-    var dataH = [{
-      x:[1,2,3,4],
-      type:"histogram"
-    }];
-
+          
     var data = [{      
-        x:mat[0],
-        y:mat[0],
+        //x:mat[0],
+        //y:mat[0],
         colorscale: cs_scl, 
         showscale: cbar,
         colorbar: col_bar, 
