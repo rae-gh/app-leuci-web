@@ -10,7 +10,23 @@ slice
 <script src="{% static 'js/make_plot.js' %}"></script>
 <script src="{% static 'js/first.js' %}"></script>
 
-<h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+<span>
+<span><h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2></span>
+<span>
+    <form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
+        {% csrf_token %}
+        <p style="display:none;visibility:collapse">        
+            <input id="width" value="{{ width }}" name="width"/>
+            <input id="samples" value="{{ samples }}" name="samples"/>
+            <input id="interp" value="{{ interp }}" name="interp"/>
+            <input id="central" value="{{ central }}" name="central"/>
+            <input id="linear" value="{{ linear }}" name="linear"/>
+            <input id="planar" value="{{ planar }}" name="planar"/>
+        </p>
+        <button class="button button1" type="submit">calculation settings</button>        
+    </form>
+</span>
+</span>
 <h3>{{ message }} </h3>
 <form method="post" action="slice" style="padding:2px !important;margin:0px !important">
     {% csrf_token %}            
@@ -69,35 +85,35 @@ slice
                 <tr style="padding:10px !important">    
                     <th>
                         <a href='https://www.ebi.ac.uk/pdbe/entry-files/pdb{{pdb_code}}.ent' target="_blank">Browse atoms</a>
-                    </th>                                        
-                    <td><button class="button button1"  type="submit">Update (x,y,z)</button></td>
-                    <th>aa</th>
+                    </th>                                                                                
                     <td>                        
                         <button class="button button1" type="submit"><<</button>
-                        <button class="button button1" type="submit">Update atoms</button>
+                        <button class="button button1" type="submit">update atoms</button>
                         <button class="button button1" type="submit">>></button>
                     </td>
-                    <th></th>
+                    <th>aa</th>
+                    <td><button class="button button1"  type="submit">update (x,y,z)</button></td>
+                    <th>dis</th>
                 </tr>
                 <tr>
                     <th>Central</th>
-                    <td><input id="central" value="{{ central }}" name="central"/></td>        
                     <td></td>
                     <td></td>
+                    <td><input id="central" value="{{ central }}" name="central"/></td>                            
                     <td></td>
                 </tr>
                 <tr>
                     <th>Linear</th>
-                    <td><input id="linear" value="{{ linear }}" name="linear"/></td>                    
                     <td></td>
                     <td></td>
+                    <td><input id="linear" value="{{ linear }}" name="linear"/></td>                                        
                     <td></td>
                 </tr>
                 <tr>
                     <th>Planar</th>                    
-                    <td><input id="planar" value="{{ planar }}" name="planar"/></td>
                     <td></td>
                     <td></td>
+                    <td><input id="planar" value="{{ planar }}" name="planar"/></td>                    
                     <td></td>
                 </tr>
                 <tr>
@@ -113,20 +129,6 @@ slice
         </td>                
     </tr>
 </table>
-
-</form>
-<hr/>
-<form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
-    {% csrf_token %}
-    <p style="display:none;visibility:collapse">        
-        <input id="width" value="{{ width }}" name="width"/>
-        <input id="samples" value="{{ samples }}" name="samples"/>
-        <input id="interp" value="{{ interp }}" name="interp"/>
-        <input id="central" value="{{ central }}" name="central"/>
-        <input id="linear" value="{{ linear }}" name="linear"/>
-        <input id="planar" value="{{ planar }}" name="planar"/>
-    </p>
-    <button class="button button1" type="submit">calculation settings</button>        
 </form>
 <hr/>
 <table width="1200px">    

@@ -5,6 +5,7 @@ httpx
 plotly
 whitenoise
 matplotlib
+numpy
 pandas
 biopython
 leuci-xyz

@@ -86,19 +86,22 @@ def download_ed(request,pdb_code,gl_ip):
     #import urllib.request
     #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
 
-def upload_ed(request,pdb_code,gl_ip):
+def upload_ed(request,pdb_code,gl_ip):    
     print("uploading...")    
-    import json
-    mload = moad.MapLoader(pdb_code, directory=DIR)
-    mload.load()
-    mload.load_values()           
-    mload.load_values(diff=True)    
-    mfunc = mfun.MapFunctions(pdb_code,mload.mobj)    
-    stre = stor.Store()        
-    stre.add_interper(pdb_code,mfunc)
-    stre.add_loader(pdb_code,mload)
-    print("added",pdb_code,"to store")            
-    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was uploaded at '+str(datetime.datetime.now())+' hours')
+    try:
+        import json
+        mload = moad.MapLoader(pdb_code, directory=DIR)
+        mload.load()
+        mload.load_values()           
+        mload.load_values(diff=True)    
+        mfunc = mfun.MapFunctions(pdb_code,mload.mobj, "linear") #the default method is linear
+        stre = stor.Store()        
+        stre.add_interper(pdb_code,mfunc)
+        stre.add_loader(pdb_code,mload)
+        print("added",pdb_code,"to store")            
+        logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was uploaded at '+str(datetime.datetime.now())+' hours')
+    except:
+        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error uploading '+str(datetime.datetime.now())+' hours')
 
 def get_interper(pdb_code):
     stre = stor.Store()        
@@ -114,7 +117,7 @@ def get_slice_settings(request):
     Returns pdb info from current state or downloads from the ebi
     """
     refresh, settings = False,False
-    width, samples, interp, central, linear, planar = 6,20,"linear","(0,0,0)","(0,0,0)","(0,0,0)"
+    width, samples, interp, central, linear, planar = 6,20,"linear","(2.884,8.478,4.586)","(3.475,7.761,5.794)","(1.791,9.045,4.633)"
 
     ret_dic = {}
     

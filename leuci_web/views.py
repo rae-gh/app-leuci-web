@@ -185,30 +185,33 @@ async def slice(request):
     else: # then it is in store        
         mobj = mfunc.mobj
         if len(mobj.values) > 0:
-            settings_dic = await sd.get_slice_settings(request)
-            for name, val in settings_dic.items():
-                context[name] = val
-            interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_settings(request)
-            context["value_check"] = mobj.values[0]
-            context["value_len"] = len(mobj.values)                        
-            import leuci_xyz.vectorthree as v3            
-            central = v3.VectorThree().from_coords(settings_dic["central"])
-            linear = v3.VectorThree().from_coords(settings_dic["linear"])
-            planar = v3.VectorThree().from_coords(settings_dic["planar"])         
-            vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]))
-            #print(vals)
-                    
-            #xy = [  [1,2,3,4,5],
-            #    [6,7,8,9,10],
-            #    [0.2,3,8,9,1],
-            #    [0.2,2,2,2,1],
-            #    [0,1,1,1,-2]] 
+            try:
+                settings_dic = await sd.get_slice_settings(request)
+                for name, val in settings_dic.items():
+                    context[name] = val
+                interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_settings(request)
+                context["value_check"] = mobj.values[0]
+                context["value_len"] = len(mobj.values)                        
+                import leuci_xyz.vectorthree as v3            
+                central = v3.VectorThree().from_coords(settings_dic["central"])
+                linear = v3.VectorThree().from_coords(settings_dic["linear"])
+                planar = v3.VectorThree().from_coords(settings_dic["planar"])         
+                vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"])
+                #print(vals)
+                        
+                #xy = [  [1,2,3,4,5],
+                #    [6,7,8,9,10],
+                #    [0.2,3,8,9,1],
+                #    [0.2,2,2,2,1],
+                #    [0,1,1,1,-2]] 
 
-            #print(xy)
-                
-            context["density_mat"] = vals
-            context["radient_mat"] = vals
-            context["laplacian_mat"] = vals
+                #print(xy)
+                    
+                context["density_mat"] = vals
+                context["radient_mat"] = vals
+                context["laplacian_mat"] = vals
+            except:
+                context["message"] = "There was an error"
         
     print("rendering...")
     return render(request, 'slice.html', context)
