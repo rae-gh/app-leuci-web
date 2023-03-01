@@ -25,11 +25,11 @@ SECRET_KEY = 'django-insecure-!j9cqzmv0!e7vx+++qp(pj!01)kiyd!567!o++mn+i4lr5(61g
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # SECURITY WARNING: don't run with debug turned on in produc  tion!
 ### These settings are for debug ###
-DEBUG = True
-ALLOWED_HOSTS = []
+#DEBUG = True
+#ALLOWED_HOSTS = []
 ###!!! These are for release !!!###
-#DEBUG = False
-#ALLOWED_HOSTS = ['leuci-web.azurewebsites.net']
+DEBUG = False
+ALLOWED_HOSTS = ['leuci-web.azurewebsites.net']
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 

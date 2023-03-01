@@ -16,12 +16,17 @@ slice
     <form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
         {% csrf_token %}
         <p style="display:none;visibility:collapse">        
+            <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
             <input id="width" value="{{ width }}" name="width"/>
             <input id="samples" value="{{ samples }}" name="samples"/>
             <input id="interp" value="{{ interp }}" name="interp"/>
             <input id="central" value="{{ central }}" name="central"/>
             <input id="linear" value="{{ linear }}" name="linear"/>
             <input id="planar" value="{{ planar }}" name="planar"/>
+            <input id="keyc" value="{{ keyc }}" name="keyc"/>
+            <input id="keyl" value="{{ keyl }}" name="keyl"/>
+            <input id="keyp" value="{{ keyp }}" name="keyp"/>
+            <input id="navigation" value="{{ navigation }}" name="navigation"/>
         </p>
         <button class="button button1" type="submit">calculation settings</button>        
     </form>
@@ -30,6 +35,13 @@ slice
 <h3>{{ message }} </h3>
 <form method="post" action="slice" style="padding:2px !important;margin:0px !important">
     {% csrf_token %}            
+    <p style="display:none;visibility:collapse">        
+        <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
+        <input id="width" value="{{ width }}" name="width"/>
+        <input id="samples" value="{{ samples }}" name="samples"/>
+        <input id="interp" value="{{ interp }}" name="interp"/>        
+        <input id="navigate" value="x" name="navigate"/>
+    </p>
 <table style="padding:10px !important; align-content:center !important; text-align:center !important;" onMouseOver="button.backgroundColor='#F8F8F8'" onMouseOut="button.backgroundColor='#FFFFFF'">
     <tr style="padding:10px !important">    
         <td width="15%" style="padding:10px !important">    
@@ -87,9 +99,9 @@ slice
                         <a href='https://www.ebi.ac.uk/pdbe/entry-files/pdb{{pdb_code}}.ent' target="_blank">Browse atoms</a>
                     </th>                                                                                
                     <td>                        
-                        <button class="button button1" type="submit"><<</button>
-                        <button class="button button1" type="submit">update atoms</button>
-                        <button class="button button1" type="submit">>></button>
+                        <button onclick="NavPressed('A:-1')" class="button button1" type="submit"><<</button>
+                        <button onclick="NavPressed('A:0')" class="button button1" type="submit">update atoms</button>
+                        <button onclick="NavPressed('A:1')" class="button button1" type="submit">>></button>
                     </td>
                     <th>aa</th>
                     <td><button class="button button1"  type="submit">update (x,y,z)</button></td>
@@ -97,24 +109,24 @@ slice
                 </tr>
                 <tr>
                     <th>Central</th>
-                    <td></td>
-                    <td></td>
+                    <td><input id="keyc" value="{{ keyc }}" name="keyc"/></td>
+                    <td>{{ aac }}</td>
                     <td><input id="central" value="{{ central }}" name="central"/></td>                            
-                    <td></td>
+                    <td>{{ disc }}</td>
                 </tr>
                 <tr>
                     <th>Linear</th>
-                    <td></td>
-                    <td></td>
+                    <td><input id="keyl" value="{{ keyl }}" name="keyl"/></td>
+                    <td>{{ aal }}</td>                    
                     <td><input id="linear" value="{{ linear }}" name="linear"/></td>                                        
-                    <td></td>
+                    <td>{{ disl }}</td>
                 </tr>
                 <tr>
                     <th>Planar</th>                    
-                    <td></td>
-                    <td></td>
+                    <td><input id="keyp" value="{{ keyp }}" name="keyp"/></td>
+                    <td>{{ aap }}</td>                    
                     <td><input id="planar" value="{{ planar }}" name="planar"/></td>                    
-                    <td></td>
+                    <td>{{ disp }}</td>
                 </tr>
                 <tr>
                     <td></td>
@@ -191,7 +203,7 @@ slice
     <input id="lap_bar_name" value='N' name="lap_bar_name"/>
     <input id="den_hue_name" value='GBR' name="den_hue_name"/>
     <input id="rad_hue_name" value='BW' name="rad_hue_name"/>
-    <input id="lap_hue_name" value='BR' name="lap_hue_name"/>
+    <input id="lap_hue_name" value='BR' name="lap_hue_name"/>    
 </p>
 <!-- page functions -->
 <script>
@@ -319,6 +331,11 @@ slice
         makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100);
     }catch(err){
         alert(err.message);
+    }
+</script>
+<script>
+    function NavPressed(navi){        
+        document.getElementById('navigate').value = navi;
     }
 </script>
 {% endblock content%}

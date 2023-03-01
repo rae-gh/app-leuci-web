@@ -19,6 +19,7 @@ import random
 # my files
 from . import sessiondata as sd
 from .classes import admin as adm
+import leuci_xyz.vectorthree as v3 
 
 # Create your views here.
 def index(request):
@@ -66,7 +67,7 @@ async def explore(request):
     
     context["full_url"] = await sd.get_url(request, ["pdb_code"])    
     gl_user, gl_ip = await get_user(request)            
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
+    pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
     if pdb_code == "":
         return render(request, 'explore.html', context)
     print(pdb_code, on_file, in_loader, in_interp)        
@@ -80,7 +81,8 @@ async def explore(request):
         loop.create_task(async_function(request,pdb_code,gl_ip))                                                                
         return render(request, 'explore.html', context)
     elif not in_interp or not in_loader :
-        context['message'] = "Uploading... "        
+        #context['message'] = "Uploading... "        
+        context['message'] = ""       
         loop = asyncio.get_event_loop()
         async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
         loop.create_task(async_function(request,pdb_code,gl_ip))
@@ -155,7 +157,8 @@ async def slice(request):
     context["full_url"] = await sd.get_url(request, ["pdb_code"])
     context['message'] = ""    
     gl_user, gl_ip = await get_user(request)            
-    pdb_code, on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+    pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+    print("page", pdb_code, nav,on_file, in_loader, in_interp)
     context['pdb_code'] = pdb_code    
     if pdb_code == "":
         context['message'] = "Please select a pdb code"   
@@ -184,20 +187,56 @@ async def slice(request):
         loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
     else: # then it is in store        
         mobj = mfunc.mobj
+        pobj = mfunc.pobj
         if len(mobj.values) > 0:
             try:
-                settings_dic = await sd.get_slice_settings(request)
-                for name, val in settings_dic.items():
-                    context[name] = val
-                interp, centralstr, linearstr, planarstr, width, samples = await sd.get_slice_settings(request)
-                context["value_check"] = mobj.values[0]
-                context["value_len"] = len(mobj.values)                        
-                import leuci_xyz.vectorthree as v3            
+                # defaults from pdb if needed
+                a1,a2,a3 = pobj.get_first_three()
+                keyl,keyc,keyp = pobj.get_key(a1),pobj.get_key(a2),pobj.get_key(a3)
+                cl,cc,cp = pobj.get_coords(a1),pobj.get_coords(a2),pobj.get_coords(a3)
+
+                settings_dic = await sd.get_slice_settings(request,[keyc,keyl,keyp],[cc,cl,cp])
+                print("page settings",settings_dic)
+
+                keyc = settings_dic["keyc"]                
+                keyl = settings_dic["keyl"]
+                keyp = settings_dic["keyp"]
                 central = v3.VectorThree().from_coords(settings_dic["central"])
                 linear = v3.VectorThree().from_coords(settings_dic["linear"])
-                planar = v3.VectorThree().from_coords(settings_dic["planar"])         
-                vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"])
-                #print(vals)
+                planar = v3.VectorThree().from_coords(settings_dic["planar"])                
+            
+                                                       
+                nav = settings_dic["navigate"]
+
+                # the key to finding the slice is the central-linear-planar coordinates
+                #if navigation == "x" then we use the given ones
+                if nav == "x":
+                #if nav == "a:" then we use the givern atoms, 0 the given ones, -1 and +1 obvious                                                                                 
+                    pass       
+                elif nav[:2] == "A:":
+                    offset = int(nav[2:])
+                    print("offset",offset)
+                    if offset != 0:
+                        keyc = pobj.get_next_key(keyc,offset)
+                        keyl = pobj.get_next_key(keyl,offset)
+                        keyp = pobj.get_next_key(keyp,offset)
+                    print(keyc,keyl,keyp)
+                    cc = pobj.get_coords_key(keyc)
+                    cl = pobj.get_coords_key(keyl)
+                    cp = pobj.get_coords_key(keyp)
+                    print(cc,cl,cp)
+                    central = v3.VectorThree().from_coords(cc)
+                    linear = v3.VectorThree().from_coords(cl)
+                    planar = v3.VectorThree().from_coords(cp)
+                    print(central.get_key(), linear.get_key(), planar.get_key())                
+                
+                vals,rads,laps = [[]],[[]],[[]]
+                vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=0)
+                if settings_dic["interp"] != "nearest":
+                    rads = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=1)
+                    if settings_dic["interp"] != "linear":
+                        laps = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=2)
+                
                         
                 #xy = [  [1,2,3,4,5],
                 #    [6,7,8,9,10],
@@ -206,12 +245,37 @@ async def slice(request):
                 #    [0,1,1,1,-2]] 
 
                 #print(xy)
-                    
+                # display for context and state
+                atc = pobj.get_atm_key(keyc)                
+                atl = pobj.get_atm_key(keyl)                
+                atp = pobj.get_atm_key(keyp)                                                
+                aac,aal,aap = atc["aa"],atl["aa"],atp["aa"]  
                 context["density_mat"] = vals
-                context["radient_mat"] = vals
-                context["laplacian_mat"] = vals
+                context["radient_mat"] = rads
+                context["laplacian_mat"] = laps
+                context['nav'] = "x"
+                context["aac"] = aac
+                context["aal"] = aal
+                context["aap"] = aap 
+                for name, val in settings_dic.items():
+                    context[name] = val                                                
+                context["value_check"] = mobj.values[0]
+                context["value_len"] = len(mobj.values)
+                context["central"] = central.get_key() 
+                context["linear"] = linear.get_key()
+                context["planar"] = planar.get_key()
+                context["keyc"] = keyc
+                context["keyl"] = keyl
+                context["keyp"] = keyp
+                # find the distance from given atoms to given coords
+                cc = v3.VectorThree().from_coords(pobj.get_coords_key(keyc))
+                ll = v3.VectorThree().from_coords(pobj.get_coords_key(keyl))
+                pp = v3.VectorThree().from_coords(pobj.get_coords_key(keyp))
+                context["disc"] = round(cc.distance(central),4)
+                context["disl"] = round(ll.distance(linear),4)
+                context["disp"] = round(pp.distance(planar),4)
             except:
-                context["message"] = "There was an error"
+                return render(request, 'error.html', context)
         
     print("rendering...")
     return render(request, 'slice.html', context)
@@ -224,7 +288,7 @@ async def slice_settings(request):
     after slecting some settings
     That way all settings are passed in a get-post, sent to slice and stored back in the page
     """
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
+    pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
     context = {}
     context['pdb_code'] = pdb_code    
     if pdb_code == "":

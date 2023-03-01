@@ -19,6 +19,7 @@ slice
         <td>
             <button class="button button1" onclick="toggleInterp('nearest')">nearest</button>
             <button class="button button1" onclick="toggleInterp('linear')">linear</button>
+            <button class="button button1" onclick="toggleInterp('cubic')">cubic</button>
             <button class="button button1" onclick="toggleInterp('spline')">spline</button>            
         </td>    
     </tr>
@@ -42,20 +43,24 @@ slice
 <hr/>
 <table>
     <tr>
+        <td style="width:10%">pdbcode</td>
+        <td><input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/></td>
+    </tr>   
+    <tr>
         <td style="width:10%">Interpolation</td>
         <td><input id="interp" value="{{ interp }}" name="interp"/></td>
     </tr>   
     <tr>        
         <td style="width:10%;">Central</td>
-        <td>{{ central }}</td>        
+        <td><input id="central" value="{{ central }}" name="central"/></td>                
     </tr>
     <tr>
         <td style="width:10%">Linear</td>
-        <td>{{ linear }}</td>        
+        <td></td><input id="linear" value="{{ linear }}" name="linear"/></td>
     </tr>
     <tr>
         <td style="width:10%">Planar</td>
-        <td>{{ planar }}</td>        
+        <td></td><input id="planar" value="{{ planar }}" name="planar"/></td>         
     </tr>
     <tr>
         <td style="width:10%">Fos</td>
@@ -68,15 +73,31 @@ slice
     <tr>
         <td style="width:10%">Nav dis</td>
         <td>0.1</td>                
-    </tr>    
+    </tr>
+    <tr>
+        <td style="width:10%">Navigation</td>
+        <td><input id="navigation" value="{{ navigation }}" name="navigation"/></td>
+    </tr>
+    <tr>
+        <td style="width:10%">Key central</td>
+        <td><input id="keyc" value="{{ keyc }}" name="keyc"/></td>
+    </tr>
+    <tr>
+        <td style="width:10%">Key linear</td>
+        <td><input id="keyl" value="{{ keyl }}" name="keyl"/></tr>
+    </tr>
+    <tr>
+        <td style="width:10%">Key planar</td>
+        <td><input id="keyp" value="{{ keyp }}" name="keyp"/></td>
+    </tr>
+    
 </table>
 </form>
 
 <!------------------- JAVASCRIPT FUNCTIONS FOR THE PAGE ELEMENTS ------------------------------->
 <script>
     function toggleInterp(method){        
-        document.getElementById('interp').value = method;
-        document.getElementById('intr').value = method;
+        document.getElementById('interp').value = method;        
     }
 </script>
 

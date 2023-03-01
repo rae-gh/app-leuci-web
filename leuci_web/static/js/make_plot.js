@@ -25,12 +25,21 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax){
     //alert(vmax)
     
     var size = (vmax - vmin) / 20;
-    var zero_frac = (0 - vmin) / (vmax - vmin);
+    var f0 = (0 - vmin) / (vmax - vmin);
+    cs_scl_br = [[0, 'CornflowerBlue'], [f0, 'Snow'], [1, 'Crimson']];
+    
+    if (f0 < 0){
+      f0 = 0;
+      cs_scl_br = [[0, 'CornflowerBlue'], [0.5, 'Snow'], [1, 'Crimson']];
+    }
+    var f1 = f0 + ((1-f0)*0.25);
+    var f2 = f0 + ((1-f0)*0.5);
+    var f3 = f0 + ((1-f0)*0.75);
 
-    cs_scl_gbr = [[0,'Grey'],[zero_frac, 'Snow'], [zero_frac+0.01, 'LightBlue'], [zero_frac+0.2, 'CornflowerBlue'], [0.8, 'Crimson'], [1, 'rgb(100, 0, 0)']];
+    cs_scl_gbr = [[0,'Grey'],[f0, 'Snow'], [f1, 'LightBlue'], [f2, 'CornflowerBlue'], [f3, 'Crimson'], [1, 'rgb(100, 0, 0)']];
     cs_scl_bw = [[0, 'Snow'], [1, 'Black']];
-    cs_scl_br = [[0, 'CornflowerBlue'], [zero_frac, 'Snow'], [1, 'Crimson']];
-    col_bar = {title: "",thickness: 15,len: 0.85,x: +.95}
+    
+    col_bar = {title: "",thickness: 15,len: 0.85,x: +.95};
 
     if (hue == "GBR"){
       cs_scl = cs_scl_gbr;

@@ -1,4 +1,0 @@
-# data files in leuci-web
-leuci_web/data/*.ccp4
-leuci_web/data/*.pdb
-leuci_web/data/*.gz
