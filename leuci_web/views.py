@@ -104,7 +104,7 @@ async def admin(request):
     
     context = {}
     gl_user, gl_ip = await get_user(request)
-    pdb_code, on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
+    pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
     adm_fetch = adm.AdminClass()    
     log_all = False
     if act == "data_show2":
