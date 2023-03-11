@@ -42,16 +42,18 @@ DIR = str(Path(__file__).resolve().parent )+ "/data/"
 def get_user(request):
     #gl_user = request.user.id    
     gl_user = ""
+    gl_str = ""
     gl_ip = str(request.META['REMOTE_ADDR'])
+    gl_str += "REM-" + gl_ip
     gl_fwd = ""
     if 'HTTP_X_FORWARDED_FOR' in request.META:
         gl_fwd = str(request.META['HTTP_X_FORWARDED_FOR'])
-    gl_rem = str(request.META['REMOTE_ADDR'])
-    
+        gl_str += "\tFWD-" + gl_fwd
+        
     #from ipware import get_client_ip
     #gl_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()    
     #gl_ip, is_routable = get_client_ip(request)
-    return gl_user, gl_ip + ":" + gl_fwd + ":" + gl_rem
+    return gl_user,  gl_str
     
         
 async def explore(request):
@@ -185,18 +187,22 @@ async def slice(request):
         loop = asyncio.get_event_loop()
         async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
         loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    else: # then it is in store        
+    else: # then it is in store and we are goingt o return a slice view
         mobj = mfunc.mobj
         pobj = mfunc.pobj
         if len(mobj.values) > 0:
             try:
-                # defaults from pdb if needed
                 a1,a2,a3 = pobj.get_first_three()
                 keyl,keyc,keyp = pobj.get_key(a1),pobj.get_key(a2),pobj.get_key(a3)
                 cl,cc,cp = pobj.get_coords(a1),pobj.get_coords(a2),pobj.get_coords(a3)
-
+                # defaults from pdb if needed
                 settings_dic = await sd.get_slice_settings(request,[keyc,keyl,keyp],[cc,cl,cp])
-                print("page settings",settings_dic)
+
+                # we need to know some of the settings, the interp and deriv
+                width = int(settings_dic["width"])
+                samples = int(settings_dic["samples"])
+                interp = settings_dic["interp"]
+                deriv = settings_dic["deriv"]
 
                 keyc = settings_dic["keyc"]                
                 keyl = settings_dic["keyl"]
@@ -204,8 +210,7 @@ async def slice(request):
                 central = v3.VectorThree().from_coords(settings_dic["central"])
                 linear = v3.VectorThree().from_coords(settings_dic["linear"])
                 planar = v3.VectorThree().from_coords(settings_dic["planar"])                
-            
-                                                       
+                                                                   
                 nav = settings_dic["navigate"]
 
                 # the key to finding the slice is the central-linear-planar coordinates
@@ -230,29 +235,10 @@ async def slice(request):
                     planar = v3.VectorThree().from_coords(cp)
                     print(central.get_key(), linear.get_key(), planar.get_key())                
                 
-                vals,rads,laps = [[]],[[]],[[]]
-                vals = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=0)
-                if settings_dic["interp"] != "nearest":
-                    rads = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=1)
-                    if settings_dic["interp"] != "linear":
-                        laps = mfunc.get_slice(central,linear,planar,int(settings_dic["width"]),int(settings_dic["samples"]),settings_dic["interp"],diff=2)
-                
-                        
-                #xy = [  [1,2,3,4,5],
-                #    [6,7,8,9,10],
-                #    [0.2,3,8,9,1],
-                #    [0.2,2,2,2,1],
-                #    [0,1,1,1,-2]] 
-
-                #print(xy)
-                # display for context and state
                 atc = pobj.get_atm_key(keyc)                
                 atl = pobj.get_atm_key(keyl)                
                 atp = pobj.get_atm_key(keyp)                                                
                 aac,aal,aap = atc["aa"],atl["aa"],atp["aa"]  
-                context["density_mat"] = vals
-                context["radient_mat"] = rads
-                context["laplacian_mat"] = laps
                 context['nav'] = "x"
                 context["aac"] = aac
                 context["aal"] = aal
@@ -267,6 +253,7 @@ async def slice(request):
                 context["keyc"] = keyc
                 context["keyl"] = keyl
                 context["keyp"] = keyp
+
                 # find the distance from given atoms to given coords
                 cc = v3.VectorThree().from_coords(pobj.get_coords_key(keyc))
                 ll = v3.VectorThree().from_coords(pobj.get_coords_key(keyl))
@@ -274,6 +261,54 @@ async def slice(request):
                 context["disc"] = round(cc.distance(central),4)
                 context["disl"] = round(ll.distance(linear),4)
                 context["disp"] = round(pp.distance(planar),4)
+                
+                vals,rads,laps = [[]],[[]],[[]]
+                context["density_mat"] = vals
+                context["radient_mat"] = rads
+                context["laplacian_mat"] = laps
+
+                context["den_blocknone"] = "" # "display:block"
+                context["rad_blocknone"] = ""
+                context["lap_blocknone"] = ""
+                context["three_blocknone"] = ""
+                context["one_blocknone"] = "display:none;visibility: collapse"
+                context["other_blocknone"] = "display:none;visibility: collapse"
+                
+
+                if deriv == "three":
+                    vals = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=0)
+                    if settings_dic["interp"] != "nearest":
+                        rads = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=1)
+                        if settings_dic["interp"] != "linear":
+                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=2)                                               
+                    context["density_mat"] = vals
+                    context["radient_mat"] = rads
+                    context["laplacian_mat"] = laps                                                            
+                else:
+                    context["den_blocknone"] = "display:none;visibility: collapse"
+                    context["rad_blocknone"] = "display:none;visibility: collapse"
+                    context["lap_blocknone"] = "display:none;visibility: collapse"
+                    context["three_blocknone"] = "display:none;visibility: collapse"
+                    context["other_blocknone"] = "display:none;visibility: collapse"
+                    if deriv == "density":
+                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=0)
+                        context["density_mat"] = vals
+                        context["den_blocknone"] = ""
+                        context["one_blocknone"] = ""
+                    elif deriv == "radient":
+                        rads = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=1)
+                        context["radient_mat"] = rads
+                        context["rad_blocknone"] = ""
+                        context["other_blocknone"] = ""
+                    elif deriv == "laplacian":
+                        laps = mfunc.get_slice(central,linear,planar,width,samples,interp,diff=2)
+                        context["radient_mat"] = laps
+                        context["lap_blocknone"] = ""
+                        context["other_blocknone"] = ""
+                print("rendering...")
+                return render(request, 'slice.html', context)
+                
+                
             except:
                 return render(request, 'error.html', context)
         

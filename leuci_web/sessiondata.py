@@ -133,7 +133,7 @@ def get_slice_settings(request,keys = [], coords = []):
     else:
         central, linear, planar = coords[0],coords[1],coords[2]
 
-    width, samples, interp = 6,100,"linear"
+    width, samples, interp,deriv = 6,100,"linear","density"
 
     navi = "x"
 
@@ -142,6 +142,7 @@ def get_slice_settings(request,keys = [], coords = []):
     req_store = request.POST        
     if 'pdb_code' in request.GET:                
         req_store = request.GET
+    #print("tmp TODO", req_store)
     
     if 'width' in req_store:
         width = int(req_store.get('width').lower())
@@ -163,6 +164,8 @@ def get_slice_settings(request,keys = [], coords = []):
         keyp = req_store.get('keyp').upper()
     if "navigate" in req_store:
         navi = req_store.get('navigate')
+    if "deriv" in req_store:
+        deriv = req_store.get('deriv')
     
     ret_dic["width"] = width
     ret_dic["samples"] = samples
@@ -174,6 +177,7 @@ def get_slice_settings(request,keys = [], coords = []):
     ret_dic["keyl"] = keyl
     ret_dic["keyp"] = keyp
     ret_dic["navigate"] = navi
+    ret_dic["deriv"] = deriv
     
     return ret_dic
 

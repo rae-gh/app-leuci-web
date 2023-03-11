@@ -16,3 +16,6 @@ https://plotly.com/python-api-reference/generated/plotly.graph_objects.Contour.h
 
 ## Async
 https://testdriven.io/blog/django-async-views/
+
+## Visual components
+https://stackoverflow.com/questions/34639583/how-can-i-create-responsive-joystick-layout-buttons-in-html

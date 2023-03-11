@@ -1,4 +1,4 @@
-{% extends 'base_explore.html' %}
+{% extends 'base.html' %}
 
 {% load static %}
 
@@ -12,22 +12,22 @@ slice
 <h3>{{ message }} </h3>
 
 
-<!-- javascript changed elements -->
+<form method="post" action="slice" style="padding:2px !important;margin:0px !important">
+    {% csrf_token %}
 <table>    
     <tr>        
         <td style="width:10%;">Interpolator</td>        
         <td>
-            <button class="button button1" onclick="toggleInterp('nearest')">nearest</button>
-            <button class="button button1" onclick="toggleInterp('linear')">linear</button>
-            <button class="button button1" onclick="toggleInterp('cubic')">cubic</button>
-            <button class="button button1" onclick="toggleInterp('spline')">spline</button>            
+            <button type="button" class="button button1" onclick="toggleInterp('nearest')">nearest</button>
+            <button type="button" class="button button1" onclick="toggleInterp('linear')">linear</button>
+            <button type="button" class="button button1" onclick="toggleInterp('cubic')">cubic</button>
+            <button type="button" class="button button1" onclick="toggleInterp('spline')">spline</button>        
+            <input id="interp" value="{{ interp }}" name="interp"/>
         </td>    
     </tr>
 </table>
 
-<!-- input changed elements -->
-<form method="post" action="slice" style="padding:2px !important;margin:0px !important">
-    {% csrf_token %}
+
 <table>    
     <tr>        
         <td style="width:10%;">Width(A)</td>
@@ -39,16 +39,16 @@ slice
     </tr>        
 </table>
 <hr/>
-<button type="submit">update</button>        
+<button type="submit">update slice</button>        
 <hr/>
 <table>
     <tr>
         <td style="width:10%">pdbcode</td>
         <td><input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/></td>
-    </tr>   
+    </tr>       
     <tr>
-        <td style="width:10%">Interpolation</td>
-        <td><input id="interp" value="{{ interp }}" name="interp"/></td>
+        <td style="width:10%">Derivative</td>
+        <td><input id="deriv" value="{{ deriv }}" name="deriv"/></td>
     </tr>   
     <tr>        
         <td style="width:10%;">Central</td>

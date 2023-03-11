@@ -10,14 +10,14 @@ explore
 <h2>Explore Density Map: <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
 <h3>{{ message }} </h3>
 <hr/>
-<table style="text-align:left;border-width:2px !important;">
-    <tr style="text-align:left;border-width:2px !important;">
-        <th style="text-align:left;border-width:2px !important;background-color:gainsboro;">
+<table style="text-align:left;border-width:0px !important;">
+    <tr style="text-align:left;border-width:0px !important;">
+        <th style="text-align:left;border-width:0px !important;background-color:white;">
             Selection
         </th>
         <th style="width:20px"></th>
-        <th style="text-align:left;border-width:2px !important;background-color:gainsboro;">
-            Details
+        <th style="text-align:left;border-width:0px !important;background-color:white;">
+            Map details
         </th>
     </tr>
     <tr>
@@ -34,8 +34,8 @@ explore
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="4" style="background-color:gainsboro;">
-                        Or choose from...
+                    <th colspan="4" style="background-color:white;">
+                        <br/>Or choose from...
                     </th>
                 </tr>
                 <tr>
@@ -179,7 +179,7 @@ explore
             </table>
         </td>
         <td></td>
-        <td style="vertical-align: text-top;background-color:aliceblue;">
+        <td style="vertical-align: text-top;background-color:rgb(162,162,208);">
             <div style="padding:5px">
                 <span>
                     <span style="font-weight: bold;">Resolution:</span>
@@ -193,18 +193,18 @@ explore
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Ebi Link:</span>                    
-                    <a href={{ ebi_link }} target = "_blank">{{ pdb_code }} link</a> 
+                    <a style="color:aliceblue !important" href={{ ebi_link }} target = "_blank">{{ pdb_code }} link</a> 
                 </span>
                 <br/>
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Map Info:</span>                    
-                    <a href="https://www.ccp4.ac.uk/html/maplib.html#description" target = "_blank">XRay Map Info</a> 
+                    <a style="color:aliceblue !important" href="https://www.ccp4.ac.uk/html/maplib.html#description" target = "_blank">XRay Map Info</a> 
                 </span>
                 <br/>
                 <span>
                     <span style="font-weight: bold;">Map Info:</span>                    
-                    <a href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php" target = "_blank">EM Map Info</a> 
+                    <a style="color:aliceblue !important" href="https://www.ccpem.ac.uk/mrc_format/mrc2014.php" target = "_blank">EM Map Info</a> 
                 </span>
                 <br/>
                 <textarea cols="50" rows="15">{{header_string}}</textarea>

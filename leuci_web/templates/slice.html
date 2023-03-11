@@ -9,42 +9,50 @@ slice
 {% block content %}
 <script src="{% static 'js/make_plot.js' %}"></script>
 <script src="{% static 'js/first.js' %}"></script>
+<table>
+    <tr>
+        <td>
+            <h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+        </td>
+        <td>
+            <form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}
+                <p style="display:none;visibility:collapse">  
+                    <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
+                    <input id="width" value="{{ width }}" name="width"/>
+                    <input id="samples" value="{{ samples }}" name="samples"/>
+                    <input id="interp" value="{{ interp }}" name="interp"/>
+                    <input id="deriv" value="{{ deriv }}" name="deriv"/>
+                    <input id="central" value="{{ central }}" name="central"/>
+                    <input id="linear" value="{{ linear }}" name="linear"/>
+                    <input id="planar" value="{{ planar }}" name="planar"/>
+                    <input id="keyc" value="{{ keyc }}" name="keyc"/>
+                    <input id="keyl" value="{{ keyl }}" name="keyl"/>
+                    <input id="keyp" value="{{ keyp }}" name="keyp"/>
+                    <input id="navigate" value="x" name="navigate"/>
+                </p>
+                <button class="button button1" type="submit">calculation settings</button>        
+            </form>
+        </td>
+    </tr>
+</table>
 
-<span>
-<span><h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2></span>
-<span>
-    <form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
-        {% csrf_token %}
-        <p style="display:none;visibility:collapse">        
-            <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
-            <input id="width" value="{{ width }}" name="width"/>
-            <input id="samples" value="{{ samples }}" name="samples"/>
-            <input id="interp" value="{{ interp }}" name="interp"/>
-            <input id="central" value="{{ central }}" name="central"/>
-            <input id="linear" value="{{ linear }}" name="linear"/>
-            <input id="planar" value="{{ planar }}" name="planar"/>
-            <input id="keyc" value="{{ keyc }}" name="keyc"/>
-            <input id="keyl" value="{{ keyl }}" name="keyl"/>
-            <input id="keyp" value="{{ keyp }}" name="keyp"/>
-            <input id="navigation" value="{{ navigation }}" name="navigation"/>
-        </p>
-        <button class="button button1" type="submit">calculation settings</button>        
-    </form>
-</span>
-</span>
 <h3>{{ message }} </h3>
 <form method="post" action="slice" style="padding:2px !important;margin:0px !important">
     {% csrf_token %}            
-    <p style="display:none;visibility:collapse">        
+    <p style="display:none;visibility:collapse"> 
         <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
         <input id="width" value="{{ width }}" name="width"/>
         <input id="samples" value="{{ samples }}" name="samples"/>
-        <input id="interp" value="{{ interp }}" name="interp"/>        
-        <input id="navigation" value="x" name="navigation"/>
+        <input id="interp_slice" value="{{ interp }}" name="interp"/>        
+        <input id="deriv_slice" value="{{ deriv }}" name="deriv"/>
+        <input id="navigate_slice" value="x" name="navigate"/>
+        {{value_len}}
+        {{value_check}}
     </p>
 <table style="padding:10px !important; align-content:center !important; text-align:center !important;" onMouseOver="button.backgroundColor='#F8F8F8'" onMouseOut="button.backgroundColor='#FFFFFF'">
     <tr style="padding:10px !important">    
-        <td width="15%" style="padding:10px !important">    
+        <td width="18%" style="padding:10px !important">    
              <!-- JOY STICK OBJECT -->
         <div id="joystick" style="width:100%;text-align:center;align-content:center">            
             <div>                                    
@@ -71,21 +79,21 @@ slice
                     <circle cx="50" cy="50" r="38" fill="url(#grad3b)" />
                     <circle cx="50" cy="50" r="20" fill="#cccccc" stroke="black" stroke-width="2px" />
 
-                    <path onclick="NavPressed('B:TO')" style="cursor:pointer" d="M50,0 54,8 46,8Z" fill="rgba(0,0,0,0.8)"><title>tilt over</title></path>
-                    <path onclick="NavPressed('B:UP')" style="cursor:pointer" d="M50,14 54,22 46,22Z" fill="rgba(0,0,0,0.8)"><title>up</title></path>                        
-                    <path onclick="NavPressed('B:DN')" style="cursor:pointer" d="M50,86 54,78 46,78Z" fill="rgba(0,0,0,0.8)"><title>down</title></path>
-                    <path onclick="NavPressed('B:TU')" style="cursor:pointer" d="M50,100 54,92 46,92Z" fill="rgba(0,0,0,0.8)"><title>tilt under</title></path>
-                    <path onclick="NavPressed('B:LE')" style="cursor:pointer" d="M14,50 22,54 22,46Z" fill="rgba(0,0,0,0.8)"><title>left</title></path>
-                    <path onclick="NavPressed('B:TL')" style="cursor:pointer" d="M0,50 8,54 8,46Z" fill="rgba(0,0,0,0.8)"><title>tilt left</title></path>
-                    <path onclick="NavPressed('B:RI')" style="cursor:pointer" d="M86,50 78,54 78,46Z" fill="rgba(0,0,0,0.8)"><title>right</title></path>
-                    <path onclick="NavPressed('B:TR')" style="cursor:pointer" d="M100,50 92,54 92,46Z" fill="rgba(0,0,0,0.8)"><title>tilt right</title></path>
-                    <path onclick="NavPressed('B:AC')" style="cursor:pointer" d="M20,20 15,15 10,25Z" fill="rgba(0,0,0,0.8)"><title>anti-clockwise</title></path>
-                    <path onclick="NavPressed('B:CL')" style="cursor:pointer" d="M80,20 85,15 90,25Z" fill="rgba(0,0,0,0.8)"><title>clockwise</title></path>
+                    <path onclick="return NavPressed('B:TO')" style="cursor:pointer" d="M50,0 54,8 46,8Z" fill="rgba(0,0,0,0.8)"><title>tilt over</title></path>
+                    <path onclick="return NavPressed('B:UP')" style="cursor:pointer" d="M50,14 54,22 46,22Z" fill="rgba(0,0,0,0.8)"><title>up</title></path>                        
+                    <path onclick="return NavPressed('B:DN')" style="cursor:pointer" d="M50,86 54,78 46,78Z" fill="rgba(0,0,0,0.8)"><title>down</title></path>
+                    <path onclick="return NavPressed('B:TU')" style="cursor:pointer" d="M50,100 54,92 46,92Z" fill="rgba(0,0,0,0.8)"><title>tilt under</title></path>
+                    <path onclick="return NavPressed('B:LE')" style="cursor:pointer" d="M14,50 22,54 22,46Z" fill="rgba(0,0,0,0.8)"><title>left</title></path>
+                    <path onclick="return NavPressed('B:TL')" style="cursor:pointer" d="M0,50 8,54 8,46Z" fill="rgba(0,0,0,0.8)"><title>tilt left</title></path>
+                    <path onclick="return NavPressed('B:RI')" style="cursor:pointer" d="M86,50 78,54 78,46Z" fill="rgba(0,0,0,0.8)"><title>right</title></path>
+                    <path onclick="return NavPressed('B:TR')" style="cursor:pointer" d="M100,50 92,54 92,46Z" fill="rgba(0,0,0,0.8)"><title>tilt right</title></path>
+                    <path onclick="return NavPressed('B:AC')" style="cursor:pointer" d="M20,20 15,15 10,25Z" fill="rgba(0,0,0,0.8)"><title>anti-clockwise</title></path>
+                    <path onclick="return NavPressed('B:CL')" style="cursor:pointer" d="M80,20 85,15 90,25Z" fill="rgba(0,0,0,0.8)"><title>clockwise</title></path>
                     <clipPath id="cut-offb">
                     <rect x="0" y="0" width="70" height="50"/>
                     </clipPath>
-                    <circle onclick="NavPressed('B:BA')" style="cursor:pointer" cx="50" cy="50" r="20" fill="darkseagreen"><title>back</title></circle>
-                    <circle onclick="NavPressed('B:FW')" style="cursor:pointer" cx="50" cy="50" r="20" fill="lightseagreen" clip-path="url(#cut-offb)"><title>fwd</title></circle>
+                    <circle onclick="return NavPressed('B:BA')" style="cursor:pointer" cx="50" cy="50" r="20" fill="darkseagreen"><title>back</title></circle>
+                    <circle onclick="return NavPressed('B:FW')" style="cursor:pointer" cx="50" cy="50" r="20" fill="lightseagreen" clip-path="url(#cut-offb)"><title>fwd</title></circle>
                 </svg>                        
                 </label>                    
             </div>                                                         
@@ -95,13 +103,13 @@ slice
         <td style="padding:10px !important">    
             <table style="padding:10px !important">    
                 <tr style="padding:10px !important">    
-                    <th>
+                    <th width="35%">
                         <a href='https://www.ebi.ac.uk/pdbe/entry-files/pdb{{pdb_code}}.ent' target="_blank">Browse atoms</a>
                     </th>                                                                                
                     <td>                        
-                        <button onclick="NavPressed('A:-1')" class="button button1" type="submit"><<</button>
-                        <button onclick="NavPressed('A:0')" class="button button1" type="submit">update atoms</button>
-                        <button onclick="NavPressed('A:1')" class="button button1" type="submit">>></button>
+                        <button onclick="return NavPressed('A:-1')" class="button button1" type="submit"><<</button>
+                        <button onclick="return NavPressed('A:0')" class="button button1" type="submit">update atoms</button>
+                        <button onclick="return NavPressed('A:1')" class="button button1" type="submit">>></button>
                     </td>
                     <th>aa</th>
                     <td><button class="button button1"  type="submit">update (x,y,z)</button></td>
@@ -129,69 +137,97 @@ slice
                     <td>{{ disp }}</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    
-                </tr>                        
-            </table>
-        </td>    
-        <td>            
-        </td>                
+                    <td colspan="5"><hr/></td>
+                </tr>
+                <tr>
+                    <th style=""> Derivative:</th>
+                    <td style="" colspan="4">                      
+                        <button onclick="return ChangeDeriv('density')" class="button button1" type="submit">density</button>
+                        <button onclick="return ChangeDeriv('radient')" class="button button1" type="submit">radient</button>                                
+                        <button onclick="return ChangeDeriv('laplacian')" class="button button1" type="submit">laplacian</button>
+                        <button onclick="return ChangeDeriv('three')" class="button button1" type="submit">all three</button>                        
+                    </td>
+                </tr>                
+            </form>                
+            </table>        
+        </td>                    
     </tr>
 </table>
-</form>
 <hr/>
-<table width="1200px">    
-    <tr>
-        <th style="text-align:left !important; width:400px">Density</th>
-        <th style="text-align:left !important; width:400px">Radient</th>
-        <th style="text-align:left !important; width:400px">Laplacian</th>
+<table width="1200px" style="border: width 1px; border-color: black;">
+    <tr style="background-color:rgb(162,162,208);{{other_blocknone}}">
+        <td style="background-color:rgb(162,162,208);color:rgb(162,162,208)">Empty</td>
     </tr>
+</table>
+<table width="1200px" style="border: width 1px; border-color: black;">
+<tr style="color:aliceblue;background-color:rgb(162,162,208);{{three_blocknone}}">
+    <th width="400px">
+        <table style="align-content:center;text-align:center;align-items:center;">
+            <tr style="align-content:center;text-align:center;align-items:center;">
+                <td style="width:10%;">Floor%</td>
+                <td style="width:40%"><input oninput="MaxMinCentred('MinLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinLeft"></td>                
+                <td style="width:10%">Cap%</td>
+                <td style="width:40%"><input oninput="MaxMinCentred('MaxLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxLeft"></td>        
+            </tr>
+        </table>    
+    </th>
+    <th width="400px"></th>
+    <th width="400px"></th>
+</tr>
+<tr style="color:aliceblue;background-color:rgb(162,162,208);{{one_blocknone}}">
+    <th width="400px"></th>
+    <th width="400px">
+        <table style="align-content:center;text-align:center;align-items:center;">
+            <tr style="align-content:center;text-align:center;align-items:center;">
+                <td style="width:10%;">Floor%</td>
+                <td style="width:40%"><input oninput="MaxMinCentred('MinCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
+                <td style="width:10%">Cap%</td>
+                <td style="width:40%"><input oninput="MaxMinCentred('MaxCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>        
+            </tr>
+        </table>    
+    </th>    
+    <th width="400px"></th>
+</tr>
+</table>
+<table width="1200px" style="border: width 1px; border-color: black;">
     <tr>
-        <td>
-            <button class="button button1" onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
-            <button class="button button1" onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
-            <button class="button button1" onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>
-            
-        </td>        
-        <td>
-            <button class="button button1" onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
-            <button class="button button1" onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
-            <button class="button button1" onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
-            
-        </td>        
-        <td>
-            <button class="button button1" onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
-            <button class="button button1" onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
-            <button class="button button1" onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
-        </td>        
-    </tr> 
-    <tr>
-        <td>
-            <table>
-                <tr>        
-                    <td style="width:10%;">Floor%</td>
-                    <td style="width:40%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>                
-                    <td style="width:10%">Cap%</td>
-                    <td style="width:40%"><input type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
-                </tr>
-            </table>    
+        <th style="background-color:white;text-align:center !important; width:400px;{{den_blocknone}};">
+            Density-{{interp}}
+            <br/>
+            <button type="button" class="button button1" onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
+            <button type="button" class="button button1" onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
+            <button type="button" class="button button1" onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>            
+        </th>
+        <th style="background-color:white;text-align:center !important; width:400px;{{rad_blocknone}}">
+            Radient-{{interp}}
+            <br/>
+            <button type="button" class="button button1" onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
+            <button type="button" class="button button1" onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
+            <button type="button" class="button button1" onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
+        </th>
+        <th style="text-align:center !important; width:400px;{{lap_blocknone}}">
+            Laplacian-{{interp}}
+            <br/>
+            <button type="button" class="button button1" onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
+            <button type="button" class="button button1" onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
+            <button type="button" class="button button1" onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
+        </th>
+    </tr>
+    <tr style="align-content:center;text-align:center;align-items:center;">        
+        <td style="background-color:white;{{den_blocknone}};align-content:center;text-align:center;align-items:center;">
+            <div style="align-content:center;text-align:center;align-items:center;">
+                
+            </div>
         </td>
-        <td></td>
-        <td></td>
+        <td style="background-color:white;{{rad_blocknone}}"></td>
+        <td style="{{lap_blocknone}}"></td>
     </tr>   
     <tr>
-        <td><div id="slice_density" style="width:100%"></div></td>            
-        <td><div id="slice_radient" style="width:100%"></div></td>            
-        <td><div id="slice_laplacian" style="width:100%"></div></td>                    
+        <td style="align-content:left; background-color:white;{{den_blocknone}}"><div id="slice_density" style="width:100%"></div></td>            
+        <td style="background-color:white;{{rad_blocknone}}"><div id="slice_radient" style="width:100%"></div></td>            
+        <td style="{{lap_blocknone}}"><div id="slice_laplacian" style="width:100%"></div></td>        
     </tr>    
 </table>
-<p>
-    {{value_len}}
-    {{value_check}}
-</p>
 <!-- hiden values for the javascript display-->
 <p style="display:none;visibility:collapse">
     <!-- HIDDEN VALUES -->
@@ -207,13 +243,23 @@ slice
 </p>
 <!-- page functions -->
 <script>
+    function ChangeDeriv(deriv){
+        try{            
+            document.getElementById("deriv_slice").value = deriv;                                
+        }catch(err){
+            alert(err.message)
+        }
+        return true;
+    }
+</script>
+<script>
     function makePlotSliceP(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
         try{                                    
             var cplot = document.getElementById(plot_id).value;
             var cbar = document.getElementById(bar_id).value;
             var chue = document.getElementById(hue_id).value;
-            var sMin = document.getElementById("rangeValueMin").value;
-            var sMax = document.getElementById("rangeValueMax").value;
+            var sMin = document.getElementById("rangeValueMinLeft").value;
+            var sMax = document.getElementById("rangeValueMaxLeft").value;
             if (deriv > 0){
                 sMin = 100;
                 sMax = 100;
@@ -238,8 +284,8 @@ slice
             var cplot = document.getElementById(plot_id).value;
             var cbar = document.getElementById(bar_id).value;
             var chue = document.getElementById(hue_id).value;    
-            var sMin = document.getElementById("rangeValueMin").value;
-            var sMax = document.getElementById("rangeValueMax").value;
+            var sMin = document.getElementById("rangeValueMinLeft").value;
+            var sMax = document.getElementById("rangeValueMaxLeft").value;
             if (deriv > 0){
                 sMin = 100;
                 sMax = 100;
@@ -264,8 +310,8 @@ slice
             var cplot = document.getElementById(plot_id).value;
             var cbar = document.getElementById(bar_id).value;
             var chue = document.getElementById(hue_id).value;      
-            var sMin = document.getElementById("rangeValueMin").value;
-            var sMax = document.getElementById("rangeValueMax").value;                  
+            var sMin = document.getElementById("rangeValueMinLeft").value;
+            var sMax = document.getElementById("rangeValueMaxLeft").value;                  
             if (deriv > 0){
                 sMin = 100;
                 sMax = 100;
@@ -286,33 +332,44 @@ slice
         }
     }
 </script>
-<script>
-    var sliderMin = document.getElementById("rangeValueMin");
-
-    sliderMin.oninput = function () {
-        try{                                 
-            var cplot = document.getElementById("den_plot_name").value;
-            var cbar = document.getElementById("den_bar_name").value;
-            var chue = document.getElementById("den_hue_name").value;      
-            var sMin = document.getElementById("rangeValueMin").value;
-            var sMax = document.getElementById("rangeValueMax").value;                                          
-            var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');                
-            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax);        
+<script>    
+    function MaxMinCentred(pos){        
+        try{
+            if (pos == "MaxCen"){
+                var val = document.getElementById("rangeValueMaxCen").value;
+                ChangeMaxMin(-1,val);
+            }else if (pos == "MaxLeft"){
+                var val = document.getElementById("rangeValueMaxLeft").value;
+                ChangeMaxMin(-1,val);
+            }else if (pos == "MinCen"){
+                var val = document.getElementById("rangeValueMinCen").value;
+                ChangeMaxMin(val,-1);
+            }else if (pos == "MinLeft"){
+                var val = document.getElementById("rangeValueMinLeft").value;
+                ChangeMaxMin(val,-1);
+            }
         }catch(err){
             alert(err.message)
         }
-    }
-</script>
-<script>
-    var sliderMax = document.getElementById("rangeValueMax");
-
-    sliderMax.oninput = function () {
+    }    
+    function ChangeMaxMin(imin,imax){        
         try{                                 
             var cplot = document.getElementById("den_plot_name").value;
             var cbar = document.getElementById("den_bar_name").value;
             var chue = document.getElementById("den_hue_name").value;      
-            var sMin = document.getElementById("rangeValueMin").value;
-            var sMax = document.getElementById("rangeValueMax").value;                                          
+            
+            if (imin > -1){
+                var sMin = imin;
+                document.getElementById("rangeValueMinLeft").value = imin;
+            }else{
+                var sMin = document.getElementById("rangeValueMinLeft").value;
+            }
+            if (imax > -1){
+                var sMax = imax;
+                document.getElementById("rangeValueMaxLeft").value = imax;
+            }else{
+                var sMax = document.getElementById("rangeValueMaxLeft").value;
+            }                        
             var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');                
             makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax);        
         }catch(err){
@@ -335,7 +392,8 @@ slice
 </script>
 <script>
     function NavPressed(navi){        
-        document.getElementById('navigate').value = navi;
+        document.getElementById('navigate_slice').value = navi;
+        return true;
     }
 </script>
 {% endblock content%}
