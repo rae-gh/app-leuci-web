@@ -1,3 +1,4 @@
+"""
 from django.db import models
 
 # Create your models here.
@@ -81,3 +82,4 @@ class Structure(models.Model):
     )
     gene=models.ForeignKey(Gene, on_delete=models.CASCADE)   
     
+"""

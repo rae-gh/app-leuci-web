@@ -21,7 +21,7 @@ slice
             <button type="button" class="button button1" onclick="toggleInterp('nearest')">nearest</button>
             <button type="button" class="button button1" onclick="toggleInterp('linear')">linear</button>
             <button type="button" class="button button1" onclick="toggleInterp('cubic')">cubic</button>
-            <button type="button" class="button button1" onclick="toggleInterp('spline')">spline</button>        
+            <button type="button" class="button button1" onclick="toggleInterp('bspline')">bspline</button>        
             <input id="interp" value="{{ interp }}" name="interp"/>
         </td>    
     </tr>
@@ -36,7 +36,27 @@ slice
     <tr>
         <td style="width:10%">Samples</td>
         <td><input id="samples" value="{{ samples }}" name="samples"/></td>                
-    </tr>        
+    </tr>
+    <tr>
+        <td style="width:10%">Fos</td>
+        <td><input id="fo" value="{{ fo }}" name="fo"/></td>                
+    </tr>    
+    <tr>
+        <td style="width:10%">Fcs</td>
+        <td><input id="fc" value="{{ fc }}" name="fc"/></td>                
+    </tr>            
+    <tr>
+        <td style="width:10%">Atom dots</td>
+        <td><input id="atomdots" value="{{ atomdots }}" name="atomdots"/></td>                
+    </tr>            
+    <tr>
+        <td style="width:10%">Position dots</td>
+        <td><input id="posdots" value="{{ posdots }}" name="posdots"/></td>
+    </tr>
+    <tr>
+        <td style="width:10%">Navigation distance</td>
+        <td><input id="navdis" value="{{ navdis }}" name="navdis"/></td>
+    </tr>
 </table>
 <hr/>
 <button type="submit">update slice</button>        
@@ -61,22 +81,10 @@ slice
     <tr>
         <td style="width:10%">Planar</td>
         <td><input id="planar" value="{{ planar }}" name="planar"/></td>         
-    </tr>
+    </tr>        
     <tr>
-        <td style="width:10%">Fos</td>
-        <td>2</td>                
-    </tr>    
-    <tr>
-        <td style="width:10%">Fcs</td>
-        <td>-1</td>                
-    </tr>    
-    <tr>
-        <td style="width:10%">Nav dis</td>
-        <td>0.1</td>                
-    </tr>
-    <tr>
-        <td style="width:10%">Navigation</td>
-        <td><input id="navigation" value="{{ navigation }}" name="navigation"/></td>
+        <td style="width:10%">Navigate</td>
+        <td><input id="navigate" value="{{ navigate }}" name="navigate"/></td>
     </tr>
     <tr>
         <td style="width:10%">Key central</td>

@@ -3,27 +3,22 @@
 (notes additional to github issues)
 
 ## Goal for 17/3/24
-- mat mult fixed
-- Fo and Fc needed for replication of plots
-- spline method add
-- relicated on google colab the paper I have written
+- make colab page for all the examples, here: https://colab.research.google.com/drive/12_lLJV7MgaRNoQbELvkQ2BEqWirGPi74#scrollTo=_ouMRxVlnO0z
+
 
 ## Bugs
-- choosing linear from settings doesn;t work on prod server, it doesn;t change anythong
-- Uploading doesn;t appear on Slice screen - it is blank
-- Don;t start uploading again if it is already uploading - check existence of file, if it is there, don't start again (can be deleted from admin)
-- When I change interp method it uses old one to calc but new one to decide which derivs to do
+- Don't start uploading again if it is already uploading - check existence of file, if it is there, don't start again (can be deleted from admin)
 - If I navigate off the end of the list for the atoms I get an error
-- have I got determinant and inverse wrong comparing with numpy
 
 ## TO DO
 - Numpy migration - delete old code, serious testing, and also change all the angles in v3
 - visual elements need to be in state so eg hue, bar, plot, three type don;t change
 - Add navigation to the spacetransform class
+ - use jax and numba and @JIT decorator
+    https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html
+    https://numba.pydata.org/numba-doc/latest/user/jit.html
 - add a reverse hue option
-- hook navigation up to examples and to leuci-web
 - Clear Memory in admin needs to be implemented
-- Long GET link needed on Scratch
 - Document leuci-map with readthedocs
 - Projection
 - Raw matrix slice - cross sections
@@ -48,17 +43,33 @@
 ----------------------------------------------------
 
 ## Missing functionaility
-- Add EM maps!!!!
-- add bspline method
-- implement diff density Fo Fc options
-  - could it set off download of diff in another thread to seppd things up
-  - mfunc needs to hold both diff objs and take FoFc
+- opt bspline method for large em
+- nearest neighbours
+- projections and cross sections
 
 ## DONE
+
+## Goal for 17/3/24 - done
+- hook in bspline to web
+- hook in fo and fc to web
+- add a GET link to web, make the code go differently so it is non async if a GET request
+- Long GET link needed on Scratch
+- hook navigation up to examples and to leuci-web
+- Add EM maps!!!!
+- have I got determinant and inverse wrong comparing with numpy
+- When I change interp method it uses old one to calc but new one to decide which derivs to do
+- the new bspline method shows something really weird on the NOS switch example - looks like out by 1 on a budge up maybe.
+55,112,73 in 3u7z is the danger area
+- choosing linear from settings doesn;t work on prod server, it doesn;t change anythong
+- Uploading doesn;t appear on Slice screen - it is blank
+- fix the bspline 3u7z problem (are they the ccp4 same in both versions? It is a boundary error)
+- mat mult fixed
+- Fo and Fc needed for replication of plots
+- spline method add
+
+
+-----------------------------------------------
 - speed up the intrpolation uing numpy in m3 classes: make it opitonal, this needs serious testin
- - use jax and numba and @JIT decorator
- https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html
- https://numba.pydata.org/numba-doc/latest/user/jit.html
 - make my c# version match numpy
 - speed up usin numpy in just the interpolation library
 -  make it density OR linear OR laplacian to save time, or ALL 3 for existing screen

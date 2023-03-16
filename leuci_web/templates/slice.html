@@ -12,7 +12,7 @@ slice
 <table>
     <tr>
         <td>
-            <h2>Slice of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+            <h2>Slice of <a href="{{ full_url }}" target = "_blank">{{ pdb_code }}</a></h2>
         </td>
         <td>
             <form method="post" action="slice_settings" style="padding:2px !important;margin:0px !important">
@@ -21,6 +21,10 @@ slice
                     <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
                     <input id="width" value="{{ width }}" name="width"/>
                     <input id="samples" value="{{ samples }}" name="samples"/>
+                    <input id="fo" value="{{ fo }}" name="fo"/>
+                    <input id="fc" value="{{ fc }}" name="fc"/>
+                    <input id="atomdots" value="{{ atomdots }}" name="atomdots"/>
+                    <input id="posdots" value="{{ posdots }}" name="posdots"/>                    
                     <input id="interp" value="{{ interp }}" name="interp"/>
                     <input id="deriv" value="{{ deriv }}" name="deriv"/>
                     <input id="central" value="{{ central }}" name="central"/>
@@ -30,6 +34,7 @@ slice
                     <input id="keyl" value="{{ keyl }}" name="keyl"/>
                     <input id="keyp" value="{{ keyp }}" name="keyp"/>
                     <input id="navigate" value="x" name="navigate"/>
+                    <input id="navdis" value="{{ navdis }}" name="navdis"/>
                 </p>
                 <button class="button button1" type="submit">calculation settings</button>        
             </form>
@@ -46,6 +51,11 @@ slice
         <input id="samples" value="{{ samples }}" name="samples"/>
         <input id="interp_slice" value="{{ interp }}" name="interp"/>        
         <input id="deriv_slice" value="{{ deriv }}" name="deriv"/>
+        <input id="fo" value="{{ fo }}" name="fo"/>
+        <input id="fc" value="{{ fc }}" name="fc"/>
+        <input id="atomdots" value="{{ atomdots }}" name="atomdots"/>
+        <input id="posdots" value="{{ posdots }}" name="posdots"/>
+        <input id="navdis" value="{{ navdis }}" name="navdis"/>
         <input id="navigate_slice" value="x" name="navigate"/>
         {{value_len}}
         {{value_check}}
@@ -79,21 +89,21 @@ slice
                     <circle cx="50" cy="50" r="38" fill="url(#grad3b)" />
                     <circle cx="50" cy="50" r="20" fill="#cccccc" stroke="black" stroke-width="2px" />
 
-                    <path onclick="return NavPressed('B:TO')" style="cursor:pointer" d="M50,0 54,8 46,8Z" fill="rgba(0,0,0,0.8)"><title>tilt over</title></path>
-                    <path onclick="return NavPressed('B:UP')" style="cursor:pointer" d="M50,14 54,22 46,22Z" fill="rgba(0,0,0,0.8)"><title>up</title></path>                        
-                    <path onclick="return NavPressed('B:DN')" style="cursor:pointer" d="M50,86 54,78 46,78Z" fill="rgba(0,0,0,0.8)"><title>down</title></path>
-                    <path onclick="return NavPressed('B:TU')" style="cursor:pointer" d="M50,100 54,92 46,92Z" fill="rgba(0,0,0,0.8)"><title>tilt under</title></path>
-                    <path onclick="return NavPressed('B:LE')" style="cursor:pointer" d="M14,50 22,54 22,46Z" fill="rgba(0,0,0,0.8)"><title>left</title></path>
-                    <path onclick="return NavPressed('B:TL')" style="cursor:pointer" d="M0,50 8,54 8,46Z" fill="rgba(0,0,0,0.8)"><title>tilt left</title></path>
-                    <path onclick="return NavPressed('B:RI')" style="cursor:pointer" d="M86,50 78,54 78,46Z" fill="rgba(0,0,0,0.8)"><title>right</title></path>
-                    <path onclick="return NavPressed('B:TR')" style="cursor:pointer" d="M100,50 92,54 92,46Z" fill="rgba(0,0,0,0.8)"><title>tilt right</title></path>
-                    <path onclick="return NavPressed('B:AC')" style="cursor:pointer" d="M20,20 15,15 10,25Z" fill="rgba(0,0,0,0.8)"><title>anti-clockwise</title></path>
-                    <path onclick="return NavPressed('B:CL')" style="cursor:pointer" d="M80,20 85,15 90,25Z" fill="rgba(0,0,0,0.8)"><title>clockwise</title></path>
+                    <path onclick="return NavPressed('N:TO')" style="cursor:pointer" d="M50,0 54,8 46,8Z" fill="rgba(0,0,0,0.8)"><title>tilt over</title></path>
+                    <path onclick="return NavPressed('N:UP')" style="cursor:pointer" d="M50,14 54,22 46,22Z" fill="rgba(0,0,0,0.8)"><title>up</title></path>                        
+                    <path onclick="return NavPressed('N:DN')" style="cursor:pointer" d="M50,86 54,78 46,78Z" fill="rgba(0,0,0,0.8)"><title>down</title></path>
+                    <path onclick="return NavPressed('N:TU')" style="cursor:pointer" d="M50,100 54,92 46,92Z" fill="rgba(0,0,0,0.8)"><title>tilt under</title></path>
+                    <path onclick="return NavPressed('N:LE')" style="cursor:pointer" d="M14,50 22,54 22,46Z" fill="rgba(0,0,0,0.8)"><title>left</title></path>
+                    <path onclick="return NavPressed('N:TL')" style="cursor:pointer" d="M0,50 8,54 8,46Z" fill="rgba(0,0,0,0.8)"><title>tilt left</title></path>
+                    <path onclick="return NavPressed('N:RI')" style="cursor:pointer" d="M86,50 78,54 78,46Z" fill="rgba(0,0,0,0.8)"><title>right</title></path>
+                    <path onclick="return NavPressed('N:TR')" style="cursor:pointer" d="M100,50 92,54 92,46Z" fill="rgba(0,0,0,0.8)"><title>tilt right</title></path>
+                    <path onclick="return NavPressed('N:AC')" style="cursor:pointer" d="M20,20 15,15 10,25Z" fill="rgba(0,0,0,0.8)"><title>anti-clockwise</title></path>
+                    <path onclick="return NavPressed('N:CL')" style="cursor:pointer" d="M80,20 85,15 90,25Z" fill="rgba(0,0,0,0.8)"><title>clockwise</title></path>
                     <clipPath id="cut-offb">
                     <rect x="0" y="0" width="70" height="50"/>
                     </clipPath>
-                    <circle onclick="return NavPressed('B:BA')" style="cursor:pointer" cx="50" cy="50" r="20" fill="darkseagreen"><title>back</title></circle>
-                    <circle onclick="return NavPressed('B:FW')" style="cursor:pointer" cx="50" cy="50" r="20" fill="lightseagreen" clip-path="url(#cut-offb)"><title>fwd</title></circle>
+                    <circle onclick="return NavPressed('N:BA')" style="cursor:pointer" cx="50" cy="50" r="20" fill="darkseagreen"><title>back</title></circle>
+                    <circle onclick="return NavPressed('N:FW')" style="cursor:pointer" cx="50" cy="50" r="20" fill="lightseagreen" clip-path="url(#cut-offb)"><title>fwd</title></circle>
                 </svg>                        
                 </label>                    
             </div>                                                         
@@ -192,21 +202,21 @@ slice
 <table width="1200px" style="border: width 1px; border-color: black;">
     <tr>
         <th style="background-color:white;text-align:center !important; width:400px;{{den_blocknone}};">
-            Density-{{interp}}
+            Density {{interp}} ({{fo}}Fo {{fc}}Fc)
             <br/>
             <button type="button" class="button button1" onclick="makePlotSliceP(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle plot</button>
             <button type="button" class="button button1" onclick="makePlotSliceB(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle bar</button>
             <button type="button" class="button button1" onclick="makePlotSliceH(0,'{{ density_mat|escapejs }}','slice_density','den_plot_name','den_bar_name','den_hue_name')">toggle hue</button>            
         </th>
         <th style="background-color:white;text-align:center !important; width:400px;{{rad_blocknone}}">
-            Radient-{{interp}}
+            Radient {{interp}} ({{fo}}Fo {{fc}}Fc)
             <br/>
             <button type="button" class="button button1" onclick="makePlotSliceP(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle plot</button>
             <button type="button" class="button button1" onclick="makePlotSliceB(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle bar</button>
             <button type="button" class="button button1" onclick="makePlotSliceH(1,'{{ radient_mat|escapejs }}','slice_radient','rad_plot_name','rad_bar_name','rad_hue_name')">toggle hue</button>            
         </th>
         <th style="text-align:center !important; width:400px;{{lap_blocknone}}">
-            Laplacian-{{interp}}
+            Laplacian {{interp}} ({{fo}}Fo {{fc}}Fc)
             <br/>
             <button type="button" class="button button1" onclick="makePlotSliceP(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle plot</button>
             <button type="button" class="button button1" onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
@@ -272,7 +282,14 @@ slice
             }
             var cplot = document.getElementById(plot_id).value;
             var mat_den = jQuery.parseJSON(mat_string);
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);        
+            // atom and pos dots are the same for all slcies
+            var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
+            var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
+            var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
+            var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
+            var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
         }catch(err){
             alert(err.message)
         }
@@ -298,7 +315,14 @@ slice
             }
             var cbar = document.getElementById(bar_id).value;
             var mat_den = jQuery.parseJSON(mat_string);
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);               
+            // atom and pos dots are the same for all slcies
+            var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
+            var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
+            var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
+            var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
+            var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
         }catch(err){
             alert(err.message)
         }
@@ -320,13 +344,26 @@ slice
             if (chue == "GBR"){
                 document.getElementById(hue_id).value = "BW";
             }else if (chue == "BW"){
+                document.getElementById(hue_id).value = "WB";
+            }else if (chue == "WB"){
                 document.getElementById(hue_id).value = "BR";
+            }else if (chue == "BR"){
+                document.getElementById(hue_id).value = "RB";
+            }else if (chue == "RB"){
+                document.getElementById(hue_id).value = "GBR";
             }else{
                 document.getElementById(hue_id).value = "GBR";
             }
             var chue = document.getElementById(hue_id).value;
             var mat_den = jQuery.parseJSON(mat_string);
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax);        
+            // atom and pos dots are the same for all slcies
+            var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
+            var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
+            var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
+            var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
+            var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
         }catch(err){
             alert(err.message)
         }
@@ -370,8 +407,15 @@ slice
             }else{
                 var sMax = document.getElementById("rangeValueMaxLeft").value;
             }                        
-            var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');                
-            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax);        
+            var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');
+            // atom and pos dots are the same for all slcies
+            var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
+            var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
+            var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
+            var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
+            var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
+            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
         }catch(err){
             alert(err.message)
         }
@@ -382,10 +426,17 @@ slice
     try{
         var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');    
         var mat_rad = jQuery.parseJSON('{{ radient_mat|escapejs }}');    
-        var mat_lap = jQuery.parseJSON('{{ laplacian_mat|escapejs }}');            
-        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100);
-        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100);
-        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100);
+        var mat_lap = jQuery.parseJSON('{{ laplacian_mat|escapejs }}');
+        // atom and pos dots are the same for all slcies
+        var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
+        var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
+        var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
+        var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
+        var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
+        var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
+        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
     }catch(err){
         alert(err.message);
     }

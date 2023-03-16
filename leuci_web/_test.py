@@ -5,8 +5,10 @@ DIR = str(Path(__file__).resolve().parent )+ "/data/"
 def explore(pdb_code):
     context = {
         'pdb_code': "", 
+        'em_code': "", 
         'resolution':"", 
         'ebi_link':"",
+        'em_link':"",
         'exp_method':"",
         'map_header':{},
         'message':""
@@ -19,6 +21,8 @@ def explore(pdb_code):
         my_pdb.download()
     context['resolution'] = my_pdb.resolution
     context['ebi_link'] = my_pdb.ebi_link
+    context['em_link'] = my_pdb.em_link
+    context['em_code'] = my_pdb.em_code
     context['exp_method'] = my_pdb.exp_method
     my_pdb.load()
     if my_pdb.em_loaded:

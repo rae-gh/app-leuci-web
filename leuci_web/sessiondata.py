@@ -11,27 +11,28 @@ import json
 
 DIR = str(Path(__file__).resolve().parent )+ "/data/"
 
-import leuci_map.mapobject as mobj
 import leuci_map.maploader as moad
+from leuci_map import mapobject as mobj
 import leuci_map.mapfunctions as mfun
 
 from .classes import store as stor
 
 @sync_to_async
-def get_url(request,items):
+def get_url(request,context,items):
     #http://127.0.0.1:8000/explore?pdb_code=2bf9        
     full_url = request.build_absolute_uri()
-    full_url += "?"
-    store = {}
-    if request.method =='POST':
-        store = request.POST
-    elif request.method =='GET':
-        store = request.GET
-    for item in items:        
-        if item in store: 
-            full_url += item + "=" + store.get(item) + "&"
-        
+    full_url += "?"        
+    for item in items:
+        #print(item,"in")
+        if item in context: 
+            full_url += item + "=" + str(context[item]) + "&"                
     return full_url[:-1]
+
+@sync_to_async
+def is_get_request(request):
+    if 'pdb_code' in request.GET:
+        return True
+    return False
 
 @sync_to_async
 def get_pdbcode_and_status(request, ret="DATA"):
@@ -95,19 +96,32 @@ def download_ed(request,pdb_code,gl_ip):
 def upload_ed(request,pdb_code,gl_ip):    
     print("uploading...")    
     try:
-        import json
-        mload = moad.MapLoader(pdb_code, directory=DIR)
-        mload.load()
-        mload.load_values()           
-        mload.load_values(diff=True)    
+        import json        
+        mload = moad.MapLoader(pdb_code, directory=DIR)        
+        mload.load()                
+        mload.load_values(diff=True)
+        #### DEBGUG CODE        
+        #print(mload.mobj.pdb_code)
+        #print(mload.mobj.pdb_link)
+        #print(mload.mobj.ebi_link)        
+        #print(mload.mobj.resolution)
+        #print(mload.mobj.exp_method)        
+        #print(mload.em_loaded)
+        #print(mload.mobj.map_header)
+        #print(mload.mobj.header_as_string)        
+        #print(mload.values_loaded)
+        #### DEBGUG CODE
+        print(mload.mobj.map_header["01_NC"],mload.mobj.map_header["02_NR"],mload.mobj.map_header["03_NS"])
+        print("FMS=",mload.mobj.F,mload.mobj.M,mload.mobj.S)
         mfunc = mfun.MapFunctions(pdb_code,mload.mobj,mload.pobj, "linear") #the default method is linear
-        stre = stor.Store()        
+        stre = stor.Store()                
         stre.add_interper(pdb_code,mfunc)
+        
         stre.add_loader(pdb_code,mload)
         print("added",pdb_code,"to store")            
         logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was uploaded at '+str(datetime.datetime.now())+' hours')
-    except:
-        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error uploading '+str(datetime.datetime.now())+' hours')
+    except Exception as e:
+        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error uploading ' + str(e) + " " + str(datetime.datetime.now())+' hours')
 
 def get_interper(pdb_code):
     stre = stor.Store()        
@@ -126,16 +140,15 @@ def get_slice_settings(request,keys = [], coords = []):
     if keys == []:
         keyc,keyl,keyp = "","",""
     else:
-        keyc,keyl,keyp = keys[0],keys[1],keys[2]
-    
+        keyc,keyl,keyp = keys[0],keys[1],keys[2]    
     if coords == []:
         central, linear, planar = "(2.884,8.478,4.586)","(3.475,7.761,5.794)","(1.791,9.045,4.633)"
     else:
         central, linear, planar = coords[0],coords[1],coords[2]
-
     width, samples, interp,deriv = 6,100,"linear","density"
-
-    navi = "x"
+    fo,fc = 2,-1
+    navi,navdis = "x",0.1
+    adots,pdots = "Y","Y"
 
     ret_dic = {}
 
@@ -166,6 +179,16 @@ def get_slice_settings(request,keys = [], coords = []):
         navi = req_store.get('navigate')
     if "deriv" in req_store:
         deriv = req_store.get('deriv')
+    if "fo" in req_store:
+        fo = int(req_store.get('fo'))
+    if "fc" in req_store:
+        fc = int(req_store.get('fc'))
+    if "atomdots" in req_store:
+        adots = req_store.get('atomdots')
+    if "posdots" in req_store:
+        pdots = req_store.get('posdots')
+    if "navdis" in req_store:
+        navdis = float(req_store.get('navdis'))
     
     ret_dic["width"] = width
     ret_dic["samples"] = samples
@@ -178,6 +201,11 @@ def get_slice_settings(request,keys = [], coords = []):
     ret_dic["keyp"] = keyp
     ret_dic["navigate"] = navi
     ret_dic["deriv"] = deriv
+    ret_dic["fo"] = fo
+    ret_dic["fc"] = fc
+    ret_dic["atomdots"] = adots
+    ret_dic["posdots"] = pdots
+    ret_dic["navdis"] = navdis
     
     return ret_dic
 
