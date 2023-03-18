@@ -3,7 +3,14 @@
 (notes additional to github issues)
 
 ## Goal for 17/3/24
+- MOST URGENT is sort out the upload and download chain of command. If downloading DO NOT redownload. If uploading DONOT re upload. Make a class checker for these 2 things - downloaded, uploaded, is_downloading, is_uploading and use that in the message status and DO NOT do them again.
+- add a wrapping funciton to leuci-maps to reduce the code to make the plots
 - make colab page for all the examples, here: https://colab.research.google.com/drive/12_lLJV7MgaRNoQbELvkQ2BEqWirGPi74#scrollTo=_ouMRxVlnO0z
+- I have got the angles the wrong way round!!!
+- add in the python download button on slice
+- more hues?
+- make the python invariant creatable from leuci-pol (take from psu multivarse)
+- add 5th degree option
 
 
 ## Bugs
@@ -11,6 +18,7 @@
 - If I navigate off the end of the list for the atoms I get an error
 
 ## TO DO
+- make density slider on projection and cross seciotn
 - Numpy migration - delete old code, serious testing, and also change all the angles in v3
 - visual elements need to be in state so eg hue, bar, plot, three type don;t change
 - Add navigation to the spacetransform class
@@ -45,11 +53,19 @@
 ## Missing functionaility
 - opt bspline method for large em
 - nearest neighbours
-- projections and cross sections
+- motif matcher
+- overlay (cross or in structure)
+- compare 2 densities (rad/lap)
+- have a python script automatically downloadable for inspection
+- eigenvalues
+
+
 
 ## DONE
 
 ## Goal for 17/3/24 - done
+- added projections
+- added cross sections
 - hook in bspline to web
 - hook in fo and fc to web
 - add a GET link to web, make the code go differently so it is non async if a GET request

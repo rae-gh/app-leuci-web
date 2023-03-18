@@ -7,35 +7,114 @@ projection
 {% endblock title %}
 
 {% block content %}
-<h2>Projection of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a></h2>
+<script src="{% static 'js/make_proj.js' %}"></script>
+<h2>Projection of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a> in orthogonal space</h2>
 <h3>{{ message }} </h3>
 {% autoescape off %}
-<table width="1200px">    
-    <tr>
-        <th style="text-align:center !important; width:400px">Density</th>
-        <th style="text-align:center !important; width:400px">Radient</th>
-        <th style="text-align:center !important; width:400px">Laplacian</th>
-    </tr>        
-    <tr>
-        <td>
-            {{ plot_div1 }}
-        </td>
-        <td>
-            {{ plot_div2 }}
-        </td>
-        <td>
-            {{ plot_div3 }}
-        </td>
-    </tr>
-</table>
 
+<table width="1200px" style="border: width 1px; border-color: black;">
+    <tr>
+        <th>
+            CR Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleProj('proj_xy','atomsXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')">toggle atoms</button>            
+        </th>
+        <th>
+            RS Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleProj('proj_yz','atomsYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}')">toggle atoms</button>            
+        </th>
+        <th>
+            SC Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleProj('proj_zx','atomsZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}')">toggle atoms</button>            
+        </th>
+    </tr>    
+    <tr>
+        <td><div id="proj_xy" style="width:100%"></div></td>            
+        <td><div id="proj_yz" style="width:100%"></div></td>            
+        <td><div id="proj_zx" style="width:100%"></div></td>        
+    </tr>    
+</table>
+<table>
+    <tr>
+        <td style="width:10%;">Floor%</td>
+        <td style="width:40%"><input oninput="Slidered()"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>                
+        <td style="width:10%">Cap%</td>
+        <td style="width:40%"><input oninput="Slidered()"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
+    </tr>
+</table>    
 {% endautoescape %}
 <p>
     {{value_len}}
     {{value_check}}
 </p>
-  
+<!-- hiden values for the javascript display-->
+<p style="display:none;visibility:collapse">
+    <!-- HIDDEN VALUES -->
+    <input id="projXY" value='N' name="projXY"/>
+    <input id="atomsXY" value='Y' name="atomsXY"/>
+    <input id="projYZ" value='N' name="projYZ"/>
+    <input id="atomsYZ" value='Y' name="atomsYZ"/>
+    <input id="projZX" value='N' name="projZX"/>
+    <input id="atomsZX" value='Y' name="atomsZX"/>    
+</p>
+<script>
+    function toggleProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name){
+        try{                                    
+            var YN = document.getElementById(elem).value;            
+            //plot type = element to change
+            if (YN == "Y"){
+                document.getElementById(elem).value = "N";
+            }else{
+                document.getElementById(elem).value = "Y";
+            }
+            makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name);            
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+    function makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name){
+        try{                                                
+            var projXY = document.getElementById(proj_elem).value;
+            var atomsXY = document.getElementById(atoms_elem).value;                                    
+            var atoms_x = jQuery.parseJSON(x_name);
+            var atoms_y = jQuery.parseJSON(y_name);            
+            var atoms_v = jQuery.parseJSON('{{ atoms_v|escapejs }}');
+            var proj_xy = jQuery.parseJSON(slice_name);
+            min_per = parseInt(document.getElementById('rangeValueMin').value);
+            max_per = parseInt(document.getElementById('rangeValueMax').value);            
+            makeProjection(proj_xy,atoms_x,atoms_y,atoms_v, div_id,projXY,atomsXY,min_per,max_per);
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+    function Slidered(){
+        try{
+            makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')
+            makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}');
+            makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}');                
+            return true;
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+</script>
+<!-- page refresh-->
+<script>
+    try{
+        toggleProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')
+        toggleProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}');
+        toggleProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}');                
+    }catch(err){
+        alert("page init error:" + err.message)
+    }
+</script>
 {% endblock content%}
+
 
 
 

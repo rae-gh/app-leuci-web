@@ -26,6 +26,7 @@ slice
                     <input id="atomdots" value="{{ atomdots }}" name="atomdots"/>
                     <input id="posdots" value="{{ posdots }}" name="posdots"/>                    
                     <input id="interp" value="{{ interp }}" name="interp"/>
+                    <input id="degree" value="{{ degree }}" name="degree"/>
                     <input id="deriv" value="{{ deriv }}" name="deriv"/>
                     <input id="central" value="{{ central }}" name="central"/>
                     <input id="linear" value="{{ linear }}" name="linear"/>
@@ -50,6 +51,7 @@ slice
         <input id="width" value="{{ width }}" name="width"/>
         <input id="samples" value="{{ samples }}" name="samples"/>
         <input id="interp_slice" value="{{ interp }}" name="interp"/>        
+        <input id="degree_slice" value="{{ degree }}" name="degree"/>        
         <input id="deriv_slice" value="{{ deriv }}" name="deriv"/>
         <input id="fo" value="{{ fo }}" name="fo"/>
         <input id="fc" value="{{ fc }}" name="fc"/>
@@ -190,9 +192,9 @@ slice
         <table style="align-content:center;text-align:center;align-items:center;">
             <tr style="align-content:center;text-align:center;align-items:center;">
                 <td style="width:10%;">Floor%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MinCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
+                <td style="width:40%"><input oninput="Slidered('Min')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
                 <td style="width:10%">Cap%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MaxCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>        
+                <td style="width:40%"><input oninput="Slidered('Max')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>        
             </tr>
         </table>    
     </th>    

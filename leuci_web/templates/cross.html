@@ -1,0 +1,140 @@
+{% extends 'base_explore.html' %}
+
+{% load static %}
+
+{% block title %}
+projection
+{% endblock title %}
+
+{% block content %}
+<script src="{% static 'js/make_cross.js' %}"></script>
+<h2>Cross-section of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a> in orthogonal space</h2>
+<h3>{{ message }} </h3>
+{% autoescape off %}
+
+<form method="post" action="cross" style="padding:2px !important;margin:0px !important">
+{% csrf_token %}
+<p style="display:none;visibility:collapse">
+    <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>                
+</p>
+
+<table width="1200px" style="border: width 1px; border-color: black;">
+    <tr>
+        <th>
+            CR Plane
+            <br/>
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleXY(-1)">-</button>
+            layer            
+            <input style="width:35px" id="layer_xy" value="{{ layer_xy }}" name="layer_xy"/>    
+            /{{ max_xy }} 
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleXY(1)">+</button>
+            <button style="font-size:18px;color:blue;" type="input" class="button button1">jump</button>
+        </th>
+        <th>
+            RS Plane
+            <br/>
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleYZ(-1)">-</button>
+            layer            
+            <input style="width:35px" id="layer_yz" value="{{ layer_yz }}" name="layer_yz"/>
+            /{{ max_yz }} 
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleYZ(1)">+</button>
+            <button style="font-size:18px;color:blue;" type="input" class="button button1">jump</button>
+        </th>
+        <th>
+            SC Plane
+            <br/>
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleZX(-1)">-</button>
+            layer            
+            <input style="width:35px" id="layer_zx" value="{{ layer_zx }}" name="layer_zx"/>    
+            /{{ max_zx }} 
+            <button style="font-size:28px;color:blue;" type="input" class="button button1" onclick="return toggleZX(1)">+</button>
+            <button style="font-size:18px;color:blue;" type="input" class="button button1">jump</button>
+        </th>
+    </tr>    
+    <tr>
+        <td><div id="proj_xy" style="width:100%"></div></td>            
+        <td><div id="proj_yz" style="width:100%"></div></td>            
+        <td><div id="proj_zx" style="width:100%"></div></td>        
+    </tr>    
+</table>
+</form>
+<table>
+    <tr>
+        <td style="width:10%;">Floor%</td>
+        <td style="width:40%"><input oninput="Slidered()"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMin"></td>                
+        <td style="width:10%">Cap%</td>
+        <td style="width:40%"><input oninput="Slidered()"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
+    </tr>
+</table>    
+{% endautoescape %}
+<p>
+    {{value_len}}
+    {{value_check}}
+</p>
+<!-- hiden values for the javascript display-->
+<script>
+    function toggleXY(val){              
+        try{
+            new_val = parseInt(document.getElementById('layer_xy').value) + val;        
+            document.getElementById('layer_xy').value = new_val;
+            return true;
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+    function toggleYZ(val){              
+        try{
+            new_val = parseInt(document.getElementById('layer_yz').value) + val;        
+            document.getElementById('layer_yz').value = new_val;
+            return true;
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+    function toggleZX(val){
+        try{
+            new_val = parseInt(document.getElementById('layer_zx').value) + val;        
+            document.getElementById('layer_zx').value = new_val;
+            return true;
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+    function Slidered(){
+        try{
+            makeCrossPlot('proj_xy','{{ cross_xy|escapejs }}')
+            makeCrossPlot('proj_yz','{{ cross_yz|escapejs }}');
+            makeCrossPlot('proj_zx','{{ cross_zx|escapejs }}');                
+            return true;
+        }catch(err){
+            alert("toggle error:" + err.message)
+        }
+    }
+</script>        
+<script>
+    function makeCrossPlot(div_id,slice_name){
+        try{                                                
+            var vals = jQuery.parseJSON(slice_name);
+            min_per = parseInt(document.getElementById('rangeValueMin').value);
+            max_per = parseInt(document.getElementById('rangeValueMax').value);
+            makeCross(div_id,vals,min_per,max_per);
+        }catch(err){
+            alert("plot error:" + err.message)
+        }
+    }
+</script>
+<!-- page refresh-->
+<script>
+    try{
+        makeCrossPlot('proj_xy','{{ cross_xy|escapejs }}')
+        makeCrossPlot('proj_yz','{{ cross_yz|escapejs }}');
+        makeCrossPlot('proj_zx','{{ cross_zx|escapejs }}');                
+    }catch(err){
+        alert("page init error:" + err.message)
+    }
+</script>
+{% endblock content%}
+
+
+
+

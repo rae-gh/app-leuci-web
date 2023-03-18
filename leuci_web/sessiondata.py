@@ -89,39 +89,45 @@ def download_ed(request,pdb_code,gl_ip):
     my_pdb = moad.MapLoader(pdb_code, directory=DIR)
     my_pdb.download()
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was downloaded at '+str(datetime.datetime.now())+' hours')
-    upload_ed(request,pdb_code,gl_ip)
+    upload_ed(request,pdb_code,gl_ip)    
     #import urllib.request
     #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
 
 def upload_ed(request,pdb_code,gl_ip):    
-    print("uploading...")    
+    mload = upload_ed_header(request,pdb_code,gl_ip)
+    upload_ed_values(request,pdb_code,mload, gl_ip)
+
+def upload_ed_header(request,pdb_code,gl_ip):        
     try:
+        stre = stor.Store()        
+        if stre.exists_interper(pdb_code):
+            mload,dt = stre.get_interper(pdb_code)    
+            return mload
+        #############################################
+        print("uploading header...")        
         import json        
         mload = moad.MapLoader(pdb_code, directory=DIR)        
-        mload.load()                
-        mload.load_values(diff=True)
-        #### DEBGUG CODE        
-        #print(mload.mobj.pdb_code)
-        #print(mload.mobj.pdb_link)
-        #print(mload.mobj.ebi_link)        
-        #print(mload.mobj.resolution)
-        #print(mload.mobj.exp_method)        
-        #print(mload.em_loaded)
-        #print(mload.mobj.map_header)
-        #print(mload.mobj.header_as_string)        
-        #print(mload.values_loaded)
-        #### DEBGUG CODE
-        print(mload.mobj.map_header["01_NC"],mload.mobj.map_header["02_NR"],mload.mobj.map_header["03_NS"])
-        print("FMS=",mload.mobj.F,mload.mobj.M,mload.mobj.S)
-        mfunc = mfun.MapFunctions(pdb_code,mload.mobj,mload.pobj, "linear") #the default method is linear
-        stre = stor.Store()                
-        stre.add_interper(pdb_code,mfunc)
-        
+        mload.load()                                                
         stre.add_loader(pdb_code,mload)
         print("added",pdb_code,"to store")            
-        logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was uploaded at '+str(datetime.datetime.now())+' hours')
+        logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was header uploaded at '+str(datetime.datetime.now())+' hours')
+        return mload
     except Exception as e:
-        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error uploading ' + str(e) + " " + str(datetime.datetime.now())+' hours')
+        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error header uploading ' + str(e) + " " + str(datetime.datetime.now())+' hours')
+
+def upload_ed_values(request,pdb_code,mload,gl_ip):    
+    print("uploading values...")    
+    try:                        
+        if not mload.wait_for_load(log_level=1):
+            mload.load_values(diff=True)
+            stre = stor.Store()
+            mfunc = mfun.MapFunctions(pdb_code,mload.mobj,mload.pobj, "linear") #the default method is linear
+            stre.add_interper(pdb_code,mfunc)        
+            print(mload.mobj.map_header["01_NC"],mload.mobj.map_header["02_NR"],mload.mobj.map_header["03_NS"])
+            print("FMS=",mload.mobj.F,mload.mobj.M,mload.mobj.S)                    
+            logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' valued loaded at '+str(datetime.datetime.now())+' hours')
+    except Exception as e:
+        logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error loading values ' + str(e) + " " + str(datetime.datetime.now())+' hours')
 
 def get_interper(pdb_code):
     stre = stor.Store()        
@@ -130,6 +136,30 @@ def get_interper(pdb_code):
 def get_store_info(gl_ip):        
     stre = stor.Store()
     return stre.print_interpers
+
+@sync_to_async
+def get_cross_settings(request):
+    """
+    Returns pdb info from current state or downloads from the ebi
+    """
+    layer_xy, layer_yz, layer_zx = 5,5,5
+    ret_dic = {}
+    req_store = request.POST        
+    if 'pdb_code' in request.GET:                
+        req_store = request.GET
+    #print(req_store)
+    if 'layer_xy' in req_store:
+        layer_xy = req_store['layer_xy']
+    if 'layer_yz' in req_store:
+        layer_yz = req_store['layer_yz']
+    if 'layer_zx' in req_store:
+        layer_zx = req_store['layer_zx']
+    ret_dic["layer_xy"] = int(layer_xy)
+    ret_dic["layer_yz"] = int(layer_yz)
+    ret_dic["layer_zx"] = int(layer_zx)
+    #print(ret_dic["layer_xy"],ret_dic["layer_yz"],ret_dic["layer_zx"])    
+    return ret_dic
+
 
 @sync_to_async
 def get_slice_settings(request,keys = [], coords = []):
@@ -145,7 +175,7 @@ def get_slice_settings(request,keys = [], coords = []):
         central, linear, planar = "(2.884,8.478,4.586)","(3.475,7.761,5.794)","(1.791,9.045,4.633)"
     else:
         central, linear, planar = coords[0],coords[1],coords[2]
-    width, samples, interp,deriv = 6,100,"linear","density"
+    width, samples, interp,deriv,degree = 6,100,"linear","density",3
     fo,fc = 2,-1
     navi,navdis = "x",0.1
     adots,pdots = "Y","Y"
@@ -179,6 +209,8 @@ def get_slice_settings(request,keys = [], coords = []):
         navi = req_store.get('navigate')
     if "deriv" in req_store:
         deriv = req_store.get('deriv')
+    if "degree" in req_store:
+        degree = req_store.get('degree')
     if "fo" in req_store:
         fo = int(req_store.get('fo'))
     if "fc" in req_store:
@@ -201,6 +233,7 @@ def get_slice_settings(request,keys = [], coords = []):
     ret_dic["keyp"] = keyp
     ret_dic["navigate"] = navi
     ret_dic["deriv"] = deriv
+    ret_dic["degree"] = degree
     ret_dic["fo"] = fo
     ret_dic["fc"] = fc
     ret_dic["atomdots"] = adots

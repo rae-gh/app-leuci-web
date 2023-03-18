@@ -84,12 +84,13 @@ async def explore(request):
         async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
         loop.create_task(async_function(request,pdb_code,gl_ip))                                                                
         return render(request, 'explore.html', context)
-    elif not in_interp or not in_loader :
-        #context['message'] = "Uploading... "        
+    elif not in_interp or not in_loader :        
         context['message'] = ""       
-        loop = asyncio.get_event_loop()
-        async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        loop.create_task(async_function(request,pdb_code,gl_ip))
+        #loop = asyncio.get_event_loop()
+        #async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        #loop.create_task(async_function(request,pdb_code,gl_ip))
+        #sd.download_ed(request,pdb_code,gl_ip)        
+        #pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
                                 
     if mobj != None:        
         print(mobj)
@@ -135,28 +136,132 @@ async def admin(request):
     return render(request, 'admin.html', context)
 
 #https://plotly.com/python-api-reference/generated/plotly.graph_objects.Contour.html?highlight=contour#plotly.graph_objects.Contour
-async def projection(request):
-    context = {}    
-    # we should already have loaded this asynchronously, too late now if we haven't
-    gl_user, gl_ip = await get_user(request)        
-    context['pdb_code'] = "dummy"
-    logging.info("INFO:\t" + gl_ip + "\t" + "dummy" + ' projection at '+str(datetime.datetime.now())+' hours')
-    context["value_check"] = 0
-    context["value_len"] = 0                        
-    xy = [  [1,2,3,4,5],
-        [6,7,8,9,10],
-        [0.2,3,8,9,1],
-        [0.2,2,2,2,1],
-        [0,1,1,1,-2]] 
+async def cross(request):    
+    context = {}
+    context['message'] = ""
+    gl_user, gl_ip = await get_user(request)
+    is_get = await sd.is_get_request(request)
+    if is_get:
+        print("GET request - synchronous version running for this function")
+    pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+    print("page", pdb_code, nav,on_file, in_loader, in_interp)
+    context['pdb_code'] = pdb_code    
+    if pdb_code == "":
+        context['message'] = "Please select a pdb code"   
+        return render(request, 'explore.html', context) #return back to choose page
 
-    from .classes import plotter
-    context["plot_div1"] = plotter.makeContour(xy)
-    context["plot_div2"] = plotter.makeHeatmap(xy)
-    context["plot_div3"] = plotter.makeContour(xy)
-            
-    print("rendering...")
-    context["full_url"] = await sd.get_url(request, context,["pdb_code","fo","fc"])    
-    return render(request, 'projection.html', context)
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
+    make_slice = True
+    if not on_file:
+        if is_get:
+            sd.download_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        else:
+            make_slice = False
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))
+    elif not in_interp or not in_loader :
+        if True:#is_get:
+            sd.upload_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        #else:
+        #    make_slice = False
+        #    context['message'] = "Uploading... "        
+        #    loop = asyncio.get_event_loop()
+        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    elif mfunc == None:
+        if True:#is_get:
+            sd.upload_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        #else:
+        #    make_slice = False
+        #    context['message'] = "Uploading... "        
+        #    loop = asyncio.get_event_loop()
+        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    if make_slice: # then it is in store and we are going to return a slice view
+        settings_dic = await sd.get_cross_settings(request)
+        context["pdb_code"] = pdb_code
+        lS,lF,lM = settings_dic["layer_xy"],settings_dic["layer_yz"],settings_dic["layer_zx"]        
+        lS,lF,lM = max(0,lS),max(0,lF),max(0,lM)
+        lS,lF,lM = min(lS,mfunc.mobj.S-1),min(lF,mfunc.mobj.F-1),min(lM,mfunc.mobj.M-1)
+        mS,mF,mM = mfunc.mobj.S-1,mfunc.mobj.F-1,mfunc.mobj.M-1
+
+        context["layer_xy"] = lS
+        context["layer_yz"] = lF
+        context["layer_zx"] = lM
+        context["max_xy"] = mS
+        context["max_yz"] = mF
+        context["max_zx"] = mM
+        context["cross_xy"] = mfunc.get_map_cross_section("xy",lS).tolist()
+        context["cross_yz"] = mfunc.get_map_cross_section("yz",lF).tolist()
+        context["cross_zx"] = mfunc.get_map_cross_section("zx",lM).tolist()
+        context["full_url"] = await sd.get_url(request, context,["pdb_code"])    
+        return render(request, 'cross.html', context)
+
+async def projection(request):
+    context = {}
+    context['message'] = ""    
+    gl_user, gl_ip = await get_user(request)
+    is_get = await sd.is_get_request(request)
+    if is_get:
+        print("GET request - synchronous version running for this function")
+    pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+    print("page", pdb_code, nav,on_file, in_loader, in_interp)
+    context['pdb_code'] = pdb_code    
+    if pdb_code == "":
+        context['message'] = "Please select a pdb code"   
+        return render(request, 'explore.html', context) #return back to choose page
+
+    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
+    make_slice = True
+    if not on_file:
+        if is_get:
+            sd.download_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        else:
+            make_slice = False
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))
+    elif not in_interp or not in_loader :
+        if True:#is_get:
+            sd.upload_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        #else:
+        #    make_slice = False
+        #    context['message'] = "Uploading... "        
+        #    loop = asyncio.get_event_loop()
+        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    elif mfunc == None:
+        if True:#is_get:
+            sd.upload_ed(request,pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+        #else:
+        #    make_slice = False
+        #    context['message'] = "Uploading... "        
+        #    loop = asyncio.get_event_loop()
+        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+    if make_slice: # then it is in store and we are going to return a slice view        
+        mobj = mfunc.mobj
+        pobj = mfunc.pobj
+        xs,ys,zs,vs = mfunc.get_atoms_projection("linear",log_level=1)          
+        context["atoms_x"] = xs
+        context["atoms_y"] = ys
+        context["atoms_z"] = zs
+        context["atoms_v"] = vs
+        context["proj_xy"] = mfunc.get_map_projection("xy").tolist()
+        context["proj_yz"] = mfunc.get_map_projection("yz").tolist()
+        context["proj_zx"] = mfunc.get_map_projection("zx").tolist()       
+        context["full_url"] = await sd.get_url(request, context,["pdb_code"])    
+        return render(request, 'projection.html', context)
+
 
 async def slice(request):
     try:
@@ -191,25 +296,25 @@ async def slice(request):
                 async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
                 loop.create_task(async_function(request,pdb_code,gl_ip))
         elif not in_interp or not in_loader :
-            if is_get:
+            if True:#is_get:
                 sd.upload_ed(request,pdb_code,gl_ip)
                 pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-            else:
-                make_slice = False
-                context['message'] = "Uploading... "        
-                loop = asyncio.get_event_loop()
-                async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-                loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+            #else:
+            #    make_slice = False
+            #    context['message'] = "Uploading... "        
+            #    loop = asyncio.get_event_loop()
+            #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
         elif mfunc == None:
-            if is_get:
+            if True:#is_get:
                 sd.upload_ed(request,pdb_code,gl_ip)
                 pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-            else:
-                make_slice = False
-                context['message'] = "Uploading... "        
-                loop = asyncio.get_event_loop()
-                async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-                loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+            #else:
+            #    make_slice = False
+            #    context['message'] = "Uploading... "        
+            #    loop = asyncio.get_event_loop()
+            #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
+            #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
         if make_slice: # then it is in store and we are going to return a slice view
             mobj = mfunc.mobj
             pobj = mfunc.pobj
@@ -227,6 +332,7 @@ async def slice(request):
                     samples = int(settings_dic["samples"])
                     interp = settings_dic["interp"]
                     deriv = settings_dic["deriv"]
+                    degree = settings_dic["degree"]
                     fo = settings_dic["fo"]
                     fc = settings_dic["fc"]
 
@@ -306,11 +412,11 @@ async def slice(request):
                     context["other_blocknone"] = "display:none;visibility: collapse"
                                         
                     if deriv == "three":
-                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
+                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree)
                         if settings_dic["interp"] != "nearest":
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree)
                             if settings_dic["interp"] != "linear":
-                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
+                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree)
                         context["density_mat"] = vals
                         context["radient_mat"] = rads
                         context["laplacian_mat"] = laps                                                                                    
@@ -321,17 +427,17 @@ async def slice(request):
                         context["three_blocknone"] = "display:none;visibility: collapse"
                         context["other_blocknone"] = "display:none;visibility: collapse"                        
                         if deriv == "density":
-                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
+                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree)
                             context["density_mat"] = vals
                             context["den_blocknone"] = ""
                             context["one_blocknone"] = ""
                         elif deriv == "radient":
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree)
                             context["radient_mat"] = rads
                             context["rad_blocknone"] = ""
                             context["other_blocknone"] = ""
                         elif deriv == "laplacian":
-                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
+                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree)
                             context["radient_mat"] = laps
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
