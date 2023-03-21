@@ -70,28 +70,28 @@ async def explore(request):
         'header_string':"",
          }                
        
+    t1 = datetime.datetime.now()
     gl_user, gl_ip = await get_user(request)            
     pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
     if pdb_code == "":
         return render(request, 'explore.html', context)
     print(pdb_code, on_file, in_loader, in_interp)        
     context['pdb_code'] = pdb_code    
+    print("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
     
     if not on_file:
         context['message'] = "Downloading... "        
         loop = asyncio.get_event_loop()
         async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
-        loop.create_task(async_function(request,pdb_code,gl_ip))                                                                
+        loop.create_task(async_function(request,pdb_code,gl_ip))
+        print("Time taken to start download",datetime.datetime.now()-t1)
         return render(request, 'explore.html', context)
-    elif not in_interp or not in_loader :        
+    elif not in_interp or not in_loader or mobj == None :        
         context['message'] = ""       
-        #loop = asyncio.get_event_loop()
-        #async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        #loop.create_task(async_function(request,pdb_code,gl_ip))
-        #sd.download_ed(request,pdb_code,gl_ip)        
-        #pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
-                                
+        mload = sd.upload_ed_header(pdb_code,gl_ip)
+        mobj = mload.mobj
+                                                
     if mobj != None:        
         print(mobj)
         context['resolution'] = mobj.resolution
@@ -103,6 +103,7 @@ async def explore(request):
         context['header_string'] = mobj.header_as_string            
         print("rendering...")
     context["full_url"] = await sd.get_url(request,context, ["pdb_code"])    
+    print("Time taken",datetime.datetime.now()-t1)
     return render(request, 'explore.html', context)
                         
 async def admin(request):
@@ -131,7 +132,7 @@ async def admin(request):
     context["pdb_code"]= pdb_code
         
     context["json"] = sd.get_store_info(gl_ip)
-                            
+                                
     print("rendering...")
     return render(request, 'admin.html', context)
 
@@ -150,6 +151,7 @@ async def cross(request):
         context['message'] = "Please select a pdb code"   
         return render(request, 'explore.html', context) #return back to choose page
 
+    print("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
     make_slice = True
     if not on_file:
@@ -162,26 +164,11 @@ async def cross(request):
             loop = asyncio.get_event_loop()
             async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
             loop.create_task(async_function(request,pdb_code,gl_ip))
-    elif not in_interp or not in_loader :
+    elif not in_interp or not in_loader or mfunc == None:
         if True:#is_get:
-            sd.upload_ed(request,pdb_code,gl_ip)
+            sd.upload_ed(pdb_code,gl_ip)
             pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-        #else:
-        #    make_slice = False
-        #    context['message'] = "Uploading... "        
-        #    loop = asyncio.get_event_loop()
-        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    elif mfunc == None:
-        if True:#is_get:
-            sd.upload_ed(request,pdb_code,gl_ip)
-            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-        #else:
-        #    make_slice = False
-        #    context['message'] = "Uploading... "        
-        #    loop = asyncio.get_event_loop()
-        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+        
     if make_slice: # then it is in store and we are going to return a slice view
         settings_dic = await sd.get_cross_settings(request)
         context["pdb_code"] = pdb_code
@@ -216,6 +203,7 @@ async def projection(request):
         context['message'] = "Please select a pdb code"   
         return render(request, 'explore.html', context) #return back to choose page
 
+    print("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' projection at '+str(datetime.datetime.now())+' hours')    
     make_slice = True
     if not on_file:
@@ -228,26 +216,11 @@ async def projection(request):
             loop = asyncio.get_event_loop()
             async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
             loop.create_task(async_function(request,pdb_code,gl_ip))
-    elif not in_interp or not in_loader :
+    elif not in_interp or not in_loader or mfunc==None:
         if True:#is_get:
-            sd.upload_ed(request,pdb_code,gl_ip)
-            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-        #else:
-        #    make_slice = False
-        #    context['message'] = "Uploading... "        
-        #    loop = asyncio.get_event_loop()
-        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-    elif mfunc == None:
-        if True:#is_get:
-            sd.upload_ed(request,pdb_code,gl_ip)
-            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-        #else:
-        #    make_slice = False
-        #    context['message'] = "Uploading... "        
-        #    loop = asyncio.get_event_loop()
-        #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-        #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+            sd.upload_ed(pdb_code,gl_ip)
+            pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")        
+            
     if make_slice: # then it is in store and we are going to return a slice view        
         mobj = mfunc.mobj
         pobj = mfunc.pobj
@@ -264,6 +237,8 @@ async def projection(request):
 
 
 async def slice(request):
+    t1 = datetime.datetime.now()
+    ts = datetime.datetime.now()
     try:
         context = {}                
         context['message'] = ""    
@@ -278,6 +253,7 @@ async def slice(request):
             context['message'] = "Please select a pdb code"   
             return render(request, 'explore.html', context) #return back to choose page
 
+        print("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice at '+str(datetime.datetime.now())+' hours')
         logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice at '+str(datetime.datetime.now())+' hours')
         context["value_check"] = -1
         context["value_len"] = -1
@@ -285,36 +261,29 @@ async def slice(request):
         context["radient_mat"] = [[]]
         context["laplacian_mat"] = [[]]
         make_slice = True
+        print("Time taken to start check on file",datetime.datetime.now()-t1)
+        t1 = datetime.datetime.now()
         if not on_file:
             if is_get:
                 sd.download_ed(request,pdb_code,gl_ip)
                 pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
+                print("Time taken to start download GET",datetime.datetime.now()-t1)
+                t1 = datetime.datetime.now()
             else:
                 make_slice = False
                 context['message'] = "Downloading... "        
                 loop = asyncio.get_event_loop()
                 async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
                 loop.create_task(async_function(request,pdb_code,gl_ip))
-        elif not in_interp or not in_loader :
+                print("Time taken to start download PUT",datetime.datetime.now()-t1)
+                t1 = datetime.datetime.now()
+        elif not in_interp or not in_loader or mfunc == None:
             if True:#is_get:
-                sd.upload_ed(request,pdb_code,gl_ip)
+                sd.upload_ed(pdb_code,gl_ip)
                 pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-            #else:
-            #    make_slice = False
-            #    context['message'] = "Uploading... "        
-            #    loop = asyncio.get_event_loop()
-            #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
-        elif mfunc == None:
-            if True:#is_get:
-                sd.upload_ed(request,pdb_code,gl_ip)
-                pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")
-            #else:
-            #    make_slice = False
-            #    context['message'] = "Uploading... "        
-            #    loop = asyncio.get_event_loop()
-            #    async_function = sync_to_async(sd.upload_ed, thread_sensitive=False)
-            #    loop.create_task(async_function(request,pdb_code,gl_ip))                                                                                
+                print("Time taken to start upload",datetime.datetime.now()-t1)
+                t1 = datetime.datetime.now()
+                                
         if make_slice: # then it is in store and we are going to return a slice view
             mobj = mfunc.mobj
             pobj = mfunc.pobj
@@ -326,6 +295,8 @@ async def slice(request):
                     cl,cc,cp = pobj.get_coords(a1),pobj.get_coords(a2),pobj.get_coords(a3)                    
                     # defaults from pdb if needed
                     settings_dic = await sd.get_slice_settings(request,[keyc,keyl,keyp],[cc,cl,cp])
+                    print("Time taken to get slice settings",datetime.datetime.now()-t1)
+                    t1 = datetime.datetime.now()
 
                     # we need to know some of the settings, the interp and deriv
                     width = int(settings_dic["width"])
@@ -410,6 +381,9 @@ async def slice(request):
                     context["three_blocknone"] = ""
                     context["one_blocknone"] = "display:none;visibility: collapse"
                     context["other_blocknone"] = "display:none;visibility: collapse"
+
+                    print("Time taken to get prepare to get slice",datetime.datetime.now()-t1)
+                    t1 = datetime.datetime.now()
                                         
                     if deriv == "three":
                         vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree)
@@ -438,10 +412,12 @@ async def slice(request):
                             context["other_blocknone"] = ""
                         elif deriv == "laplacian":
                             laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree)
-                            context["radient_mat"] = laps
+                            context["laplacian_mat"] = laps
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
                     
+                    print("Time taken to get get slice",datetime.datetime.now()-t1)
+                    t1 = datetime.datetime.now()
                     ## Finally create the position dots if we want them
                     pdots = settings_dic["posdots"]
                     adots = settings_dic["atomdots"]                    
@@ -468,7 +444,7 @@ async def slice(request):
                         for dot in dots:
                             posD = spc.reverse_transformation(dot)                        
                             posDp = posD.get_point_pos(samples,width)                                                
-                            print("Dot",posDp.get_key())                                                
+                            #print("Dot",posDp.get_key())                                                
                             # The C value will be zero as it is on the plane - that is because these are the points we made the plane with
                             # The xy heatmap has been arranged so the x value is above so linear is upwards, so the y axis (ok a bit confusing.... should I change it)?
                             if posDp.A > 0 and posDp.A < samples and posDp.B > 0 and posDp.B < samples:
@@ -482,14 +458,18 @@ async def slice(request):
                                     context["negi_dotsX"].append(posDp.B)
                                     context["negi_dotsY"].append(posDp.A)
                                                                                                                               
-                    print("rendering...")                    
+                    print("Time taken to add dots",datetime.datetime.now()-t1)
+                    print("rendering... took",datetime.datetime.now()-ts)                    
                     context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
+                    strmsg = "INFO:\t" + gl_ip + "\t" + pdb_code + ' slice time taken '+str(datetime.datetime.now())+' hours is '+ str(datetime.datetime.now()-ts)
+                    logging.info(strmsg)
                     return render(request, 'slice.html', context)
                     
                 except Exception as e:
                     context["message"] = str(e)                    
                     return render(request, 'error.html', context)
             
+        print("Time taken",datetime.datetime.now()-t1)
         print("rendering...")
         context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
         return render(request, 'slice.html', context)
@@ -513,6 +493,7 @@ async def slice_settings(request):
         return render(request, 'explore.html', context) #return back to choose page
 
     gl_user, gl_ip = await get_user(request)    
+    print("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice settings at '+str(datetime.datetime.now())+' hours')
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' slice settings at '+str(datetime.datetime.now())+' hours')
     print("rendering...")
     settings_dic = await sd.get_slice_settings(request)            

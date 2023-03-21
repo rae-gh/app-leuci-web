@@ -82,26 +82,25 @@ def get_pdbcode_and_status(request, ret="DATA"):
         return pdb_code, nav,on_file, in_loader, in_interp,mfunc
     else:
         return pdb_code, nav,on_file, in_loader, in_interp,mobj
-
-                   
+           
 def download_ed(request,pdb_code,gl_ip):    
     print("downloading...")    
     my_pdb = moad.MapLoader(pdb_code, directory=DIR)
     my_pdb.download()
     logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was downloaded at '+str(datetime.datetime.now())+' hours')
-    upload_ed(request,pdb_code,gl_ip)    
+    #upload_ed(request,pdb_code,gl_ip)    
     #import urllib.request
     #urllib.request.urlretrieve(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdbcode}.ent", filename)
 
-def upload_ed(request,pdb_code,gl_ip):    
-    mload = upload_ed_header(request,pdb_code,gl_ip)
-    upload_ed_values(request,pdb_code,mload, gl_ip)
+def upload_ed(pdb_code,gl_ip):
+    mload = upload_ed_header(pdb_code,gl_ip)
+    upload_ed_values(pdb_code,mload, gl_ip)
 
-def upload_ed_header(request,pdb_code,gl_ip):        
+def upload_ed_header(pdb_code,gl_ip):
     try:
-        stre = stor.Store()        
+        stre = stor.Store()
         if stre.exists_interper(pdb_code):
-            mload,dt = stre.get_interper(pdb_code)    
+            mload,dt = stre.get_interper(pdb_code)
             return mload
         #############################################
         print("uploading header...")        
@@ -115,7 +114,7 @@ def upload_ed_header(request,pdb_code,gl_ip):
     except Exception as e:
         logging.info("ERROR:\t" + gl_ip + "\t" + pdb_code + ' error header uploading ' + str(e) + " " + str(datetime.datetime.now())+' hours')
 
-def upload_ed_values(request,pdb_code,mload,gl_ip):    
+def upload_ed_values(pdb_code,mload,gl_ip):    
     print("uploading values...")    
     try:                        
         if not mload.wait_for_load(log_level=1):

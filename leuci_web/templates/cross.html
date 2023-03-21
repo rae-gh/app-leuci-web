@@ -117,7 +117,7 @@ projection
             var vals = jQuery.parseJSON(slice_name);
             min_per = parseInt(document.getElementById('rangeValueMin').value);
             max_per = parseInt(document.getElementById('rangeValueMax').value);
-            makeCross(div_id,vals,min_per,max_per);
+            makeCross(div_id,vals,min_per,max_per,true);
         }catch(err){
             alert("plot error:" + err.message)
         }

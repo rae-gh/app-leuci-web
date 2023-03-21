@@ -24,3 +24,6 @@ https://stackoverflow.com/questions/34639583/how-can-i-create-responsive-joystic
 https://docs.djangoproject.com/en/dev/topics/http/file-uploads/ file uploads
 https://studygyaan.com/django/how-to-upload-and-download-files-in-django?utm_content=cmp-true
 file downloads: https://www.youtube.com/watch?v=r_6VQozZD8M
+
+## Maths
+https://www.ch.imperial.ac.uk/rzepa/blog/?p=2183 eigen values, and laplacian surface add to visualisation using jsmol

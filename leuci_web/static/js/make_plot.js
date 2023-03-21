@@ -7,13 +7,14 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     var data_scatter_pos_zero = {        
       x: zero_dotsX,
       y: zero_dotsY,
-      hoverinfo:'none',
+      hoverinfo:'skip',
+      hovertemplate:'',
       mode: 'markers',
       type: "scatter",
       colorscale: [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0, 100, 0,1)']],
       showscale: false,     
       showlegend: false,
-      name:"pos data",
+      name: "",
       marker: {
           color: 'Gold',
           size: 4,            
@@ -22,13 +23,14 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     var data_scatter_pos_posi = {        
       x: posi_dotsX,
       y: posi_dotsY,
-      hoverinfo:'none',
+      hoverinfo:'skip',
+      hovertemplate:'',
       mode: 'markers',
       type: "scatter",
       colorscale: [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0, 100, 0,1)']],
       showscale: false,     
       showlegend: false,
-      name:"pos data",
+      name: "",
       marker: {
           color: 'cyan',
           size: 4,            
@@ -37,13 +39,14 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     var data_scatter_pos_negi = {        
       x: negi_dotsX,
       y: negi_dotsY,
-      hoverinfo:'none',
+      hoverinfo:'skip',
+      hovertemplate:'',
       mode: 'markers',
       type: "scatter",
       colorscale: [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0, 100, 0,1)']],
       showscale: false,     
       showlegend: false,
-      name:"pos data",
+      name: "",
       marker: {
           color: 'lime',
           size: 4,            
@@ -109,9 +112,10 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
       showscale: cbar,
       colorbar: col_bar, 
       z: mat, 
+      hovertemplate:'%{z:.4f}',
       type: plot_type,          
       line: { width: 0.5, color: 'Gray' },
-      name: "XY",
+      name: "",
       zmin:vmin,
       zmax:vmax,
       contours: {
@@ -125,7 +129,7 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     
     var layout = {
         grid: { rows: 1, columns: 1, pattern: 'independent' },
-        hovermode:false,
+        //hovermode:false,
         autosize: true,
         title: '',
         showlegend: false,

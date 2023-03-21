@@ -22,14 +22,19 @@ function makeProjection(proj_xy,atoms_x,atoms_y,atoms_v,div_id,proj,atoms,min_pe
     var f1 = f0 + ((1-f0)*0.25);
     var f2 = f0 + ((1-f0)*0.5);
     var f3 = f0 + ((1-f0)*0.75);
-    cs_scl_gbr = [[0,'Grey'],[f0, 'Snow'], [f1, 'LightBlue'], [f2, 'CornflowerBlue'], [f3, 'Crimson'], [1, 'rgb(100, 0, 0)']];
-    
+
+    if (vmin >= 0){
+      cs_scl_gbr = [[0, 'Snow'], [f1, 'LightBlue'], [f2, 'CornflowerBlue'], [f3, 'Crimson'], [1, 'rgb(100, 0, 0)']];
+    }else{
+      cs_scl_gbr = [[0,'Grey'],[f0, 'Snow'], [f1, 'LightBlue'], [f2, 'CornflowerBlue'], [f3, 'Crimson'], [1, 'rgb(100, 0, 0)']];
+    }
+        
     var trace_slice = {            
       colorscale: cs_proj, 
       showscale: false,      
       z: proj_xy, 
       type: "heatmap",
-      hovertemplate:'Val:%{z:.4f}',
+      hovertemplate:'%{z:.4f}',
       zmin:vmin,
       zmax:vmax,
       name:""
@@ -39,13 +44,16 @@ function makeProjection(proj_xy,atoms_x,atoms_y,atoms_v,div_id,proj,atoms,min_pe
       x: atoms_x,
       y: atoms_y,
       mode: 'markers',
+      hoverinfo:'skip',
       hovertemplate:'',
       marker: {
           colorscale: cs_atoms,
           color: atoms_v,
           size: 5,
-          showscale: false,                    
-      },
+          showscale: false,
+          cmin:vmin,
+          cmax:vmax,
+      },      
     };
 
     var data = []

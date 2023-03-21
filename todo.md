@@ -58,6 +58,8 @@
 - compare 2 densities (rad/lap)
 - have a python script automatically downloadable for inspection
 - eigenvalues
+- convert to standard deviations
+- pass the actual matrices back and forth and only recalc if ncessary
 
 
 
