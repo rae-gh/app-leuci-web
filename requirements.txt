@@ -2,6 +2,7 @@ pip-upgrader
 pysam
 django
 uvicorn
+gunicorn
 httpx
 plotly
 whitenoise
@@ -9,6 +10,7 @@ matplotlib
 numpy
 pandas
 biopython
+scipy
 leuci-xyz
 leuci-pol
 leuci-map

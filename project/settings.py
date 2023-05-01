@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
+
 """
 
 from pathlib import Path
@@ -26,8 +27,8 @@ SECRET_KEY = 'django-insecure-!j9cqzmv0!e7vx+++qp(pj!01)kiyd!567!o++mn+i4lr5(61g
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True ### These settings are for debug ###
-DEBUG = False ###!!! These are for release !!!###
+DEBUG = True ### These settings are for debug ###
+#DEBUG = False ###!!! These are for release !!!###
 ALLOWED_HOSTS = ['leuci-web.azurewebsites.net', '127.0.0.1']
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -165,4 +166,10 @@ LOGGING = {
         },
     },
 }
+
+#https://github.com/encode/uvicorn/issues/709
+from uvicorn.workers import UvicornWorker as BaseUvicornWorker
+
+class UvicornWorker(BaseUvicornWorker):
+    CONFIG_KWARGS = {"loop": "uvloop", "http": "httptools", "lifespan": "off"}
 
