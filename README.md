@@ -31,6 +31,10 @@ If necessary run the migrations on first clone
 python manage.py makemigrations
 python manage.py migrate
 ```
+If you want to get the static files together for debug False locally:
+```
+python manage.py collectstatic
+```
 
 
 

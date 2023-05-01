@@ -12,33 +12,6 @@ projection
 <h3>{{ message }} </h3>
 {% autoescape off %}
 
-<table width="1200px" style="border: width 1px; border-color: black;">
-    <tr>
-        <th>
-            CR Plane
-            <br/>
-            <button type="button" class="button button1" onclick="toggleProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')">toggle crystal</button>
-            <button type="button" class="button button1" onclick="toggleProj('proj_xy','atomsXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')">toggle atoms</button>            
-        </th>
-        <th>
-            RS Plane
-            <br/>
-            <button type="button" class="button button1" onclick="toggleProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}')">toggle crystal</button>
-            <button type="button" class="button button1" onclick="toggleProj('proj_yz','atomsYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}')">toggle atoms</button>            
-        </th>
-        <th>
-            SC Plane
-            <br/>
-            <button type="button" class="button button1" onclick="toggleProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}')">toggle crystal</button>
-            <button type="button" class="button button1" onclick="toggleProj('proj_zx','atomsZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}')">toggle atoms</button>            
-        </th>
-    </tr>    
-    <tr>
-        <td><div id="proj_xy" style="width:100%"></div></td>            
-        <td><div id="proj_yz" style="width:100%"></div></td>            
-        <td><div id="proj_zx" style="width:100%"></div></td>        
-    </tr>    
-</table>
 <table>
     <tr>
         <td style="width:10%;">Floor%</td>
@@ -47,6 +20,40 @@ projection
         <td style="width:40%"><input oninput="Slidered()"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMax"></td>        
     </tr>
 </table>    
+
+<table width="1200px" style="border: width 1px; border-color: black;">
+    <tr>
+        <th>
+            CR Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleCrystal('CR')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleAtoms('CR')">toggle atoms</button>
+        </th>
+        <th>
+            RS Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleCrystal('RS')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleAtoms('RS')">toggle atoms</button>
+        </th>
+        <th>
+            SC Plane
+            <br/>
+            <button type="button" class="button button1" onclick="toggleCrystal('SC')">toggle crystal</button>
+            <button type="button" class="button button1" onclick="toggleAtoms('SC')">toggle atoms</button>
+        </th>
+    </tr>    
+    <tr>
+        <td><div id="proj_xy" style="width:100%"></div></td>            
+        <td><div id="proj_yz" style="width:100%"></div></td>            
+        <td><div id="proj_zx" style="width:100%"></div></td>        
+    </tr>    
+    <tr>
+        <td><div id="proj_a_xy" style="width:100%"></div></td>            
+        <td><div id="proj_a_yz" style="width:100%"></div></td>            
+        <td><div id="proj_a_zx" style="width:100%"></div></td>        
+    </tr> 
+</table>
+
 {% endautoescape %}
 <p>
     {{value_len}}
@@ -63,40 +70,95 @@ projection
     <input id="atomsZX" value='Y' name="atomsZX"/>    
 </p>
 <script>
-    function toggleProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name){
+    function toggleAtoms(plane){        
+        try{            
+            if (plane == "CR"){
+                var YN = document.getElementById("atomsXY").value;
+                if (YN == "Y"){document.getElementById("atomsXY").value = "N";}else{document.getElementById("atomsXY").value = "Y";}                
+                makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_xy','projXY','projXY','atomsXY','{{ proj_xy_atoms|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ x_xy|escapejs }}','{{ y_xy|escapejs }}');
+            }else if (plane == "RS"){
+                var YN = document.getElementById("atomsYZ").value;
+                if (YN == "Y"){document.getElementById("atomsYZ").value = "N";}else{document.getElementById("atomsYZ").value = "Y";}                
+                makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_yz','projYZ','projYZ','atomsYZ','{{ proj_yz_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ x_yz|escapejs }}','{{ y_yz|escapejs }}');            
+            }else{                
+                var YN = document.getElementById("atomsZX").value;
+                if (YN == "Y"){document.getElementById("atomsZX").value = "N";}else{document.getElementById("atomsZX").value = "Y";}                
+                makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_zx','projZX','projZX','atomsZX','{{ proj_zx_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ x_zx|escapejs }}','{{ y_zx|escapejs }}');
+            }
+                                                                        
+        }catch(err){
+            alert("toggle error:" + err.message);
+        }
+    }
+    function toggleCrystal(plane){        
+        try{            
+            if (plane == "CR"){
+                var YN = document.getElementById("projXY").value;
+                if (YN == "Y"){document.getElementById("projXY").value = "N";}else{document.getElementById("projXY").value = "Y";}                
+                makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_xy','projXY','projXY','atomsXY','{{ proj_xy_atoms|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ x_xy|escapejs }}','{{ y_xy|escapejs }}');
+            }else if (plane == "RS"){
+                var YN = document.getElementById("projYZ").value;
+                if (YN == "Y"){document.getElementById("projYZ").value = "N";}else{document.getElementById("projYZ").value = "Y";}                
+                makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_yz','projYZ','projYZ','atomsYZ','{{ proj_yz_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ x_yz|escapejs }}','{{ y_yz|escapejs }}');            
+            }else{                
+                var YN = document.getElementById("projZX").value;
+                if (YN == "Y"){document.getElementById("projZX").value = "N";}else{document.getElementById("projZX").value = "Y";}                
+                makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+                makeProj('proj_a_zx','projZX','projZX','atomsZX','{{ proj_zx_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ x_zx|escapejs }}','{{ y_zx|escapejs }}');
+            }
+                                                                        
+        }catch(err){
+            alert("toggle error:" + err.message);
+        }
+    }
+
+    function toggleProj(div_id,div_ida,elem,proj_elem,atoms_elem,slice_name,x_name,y_name){                                                
         try{                                    
-            var YN = document.getElementById(elem).value;            
+            var YN = document.getElementById(elem).value;
             //plot type = element to change
             if (YN == "Y"){
                 document.getElementById(elem).value = "N";
             }else{
                 document.getElementById(elem).value = "Y";
-            }
-            makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name);            
+            }            
+            makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name,'{{ empty|escapejs }}','{{ empty|escapejs }}');            
+            makeProj(div_ida,elem,proj_elem,atoms_elem,slice_name,x_name,y_name,'{{ atoms_x|escapejs }}','{{ atoms_x|escapejs }}');            
         }catch(err){
             alert("toggle error:" + err.message)
         }
     }
-    function makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name){
+    function makeProj(div_id,elem,proj_elem,atoms_elem,slice_name,x_name,y_name,x_axis,y_axis){
         try{                                                
             var projXY = document.getElementById(proj_elem).value;
             var atomsXY = document.getElementById(atoms_elem).value;                                    
             var atoms_x = jQuery.parseJSON(x_name);
-            var atoms_y = jQuery.parseJSON(y_name);            
+            var atoms_y = jQuery.parseJSON(y_name);
             var atoms_v = jQuery.parseJSON('{{ atoms_v|escapejs }}');
-            var proj_xy = jQuery.parseJSON(slice_name);
+            var proj_xy = jQuery.parseJSON(slice_name);            
+            axis_x = jQuery.parseJSON(x_axis);            
+            axis_y = jQuery.parseJSON(y_axis);                        
             min_per = parseInt(document.getElementById('rangeValueMin').value);
             max_per = parseInt(document.getElementById('rangeValueMax').value);            
-            makeProjection(proj_xy,atoms_x,atoms_y,atoms_v, div_id,projXY,atomsXY,min_per,max_per);
+            makeProjection(proj_xy,atoms_x,atoms_y,atoms_v, div_id,projXY,atomsXY,min_per,max_per,axis_x,axis_y);
         }catch(err){
             alert("toggle error:" + err.message)
         }
     }
     function Slidered(){
         try{
-            makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')
-            makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}');
-            makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}');                
+            makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+            makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+            makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+
+            makeProj('proj_a_xy','projXY','projXY','atomsXY','{{ proj_xy_atoms|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ x_xy|escapejs }}','{{ y_xy|escapejs }}');
+            makeProj('proj_a_yz','projYZ','projYZ','atomsYZ','{{ proj_yz_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ x_yz|escapejs }}','{{ y_yz|escapejs }}');
+            makeProj('proj_a_zx','projZX','projZX','atomsZX','{{ proj_zx_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ x_zx|escapejs }}','{{ y_zx|escapejs }}');
+            
             return true;
         }catch(err){
             alert("toggle error:" + err.message)
@@ -106,9 +168,19 @@ projection
 <!-- page refresh-->
 <script>
     try{
-        toggleProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}')
-        toggleProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}');
-        toggleProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}');                
+        document.getElementById("projXY").value = "Y";
+        document.getElementById("projYZ").value = "Y";
+        document.getElementById("projZX").value = "Y";
+        document.getElementById("atomsXY").value = "Y";
+        document.getElementById("atomsYZ").value = "Y";
+        document.getElementById("atomsZX").value = "Y";
+        makeProj('proj_xy','projXY','projXY','atomsXY','{{ proj_xy|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+        makeProj('proj_yz','projYZ','projYZ','atomsYZ','{{ proj_yz|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+        makeProj('proj_zx','projZX','projZX','atomsZX','{{ proj_zx|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ empty|escapejs }}','{{ empty|escapejs }}');
+        
+        makeProj('proj_a_xy','projXY','projXY','atomsXY','{{ proj_xy_atoms|escapejs }}','{{ atoms_y|escapejs }}','{{ atoms_x|escapejs }}','{{ x_xy|escapejs }}','{{ y_xy|escapejs }}');
+        makeProj('proj_a_yz','projYZ','projYZ','atomsYZ','{{ proj_yz_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_y|escapejs }}','{{ x_yz|escapejs }}','{{ y_yz|escapejs }}');
+        makeProj('proj_a_zx','projZX','projZX','atomsZX','{{ proj_zx_atoms|escapejs }}','{{ atoms_z|escapejs }}','{{ atoms_x|escapejs }}','{{ x_zx|escapejs }}','{{ y_zx|escapejs }}');
     }catch(err){
         alert("page init error:" + err.message)
     }

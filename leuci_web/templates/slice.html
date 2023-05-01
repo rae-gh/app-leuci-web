@@ -25,8 +25,7 @@ slice
                     <input id="fc" value="{{ fc }}" name="fc"/>
                     <input id="atomdots" value="{{ atomdots }}" name="atomdots"/>
                     <input id="posdots" value="{{ posdots }}" name="posdots"/>                    
-                    <input id="interp" value="{{ interp }}" name="interp"/>
-                    <input id="degree" value="{{ degree }}" name="degree"/>
+                    <input id="interp" value="{{ interp }}" name="interp"/>                    
                     <input id="deriv" value="{{ deriv }}" name="deriv"/>
                     <input id="central" value="{{ central }}" name="central"/>
                     <input id="linear" value="{{ linear }}" name="linear"/>
@@ -50,15 +49,16 @@ slice
         <input id="pdb_code" value="{{ pdb_code }}" name="pdb_code"/>
         <input id="width" value="{{ width }}" name="width"/>
         <input id="samples" value="{{ samples }}" name="samples"/>
-        <input id="interp_slice" value="{{ interp }}" name="interp"/>        
-        <input id="degree_slice" value="{{ degree }}" name="degree"/>        
-        <input id="deriv_slice" value="{{ deriv }}" name="deriv"/>
+        <input id="interp_slice" value="{{ interp }}" name="interp"/>                
+        <input id="deriv_slice" value="{{ deriv }}" name="deriv"/>        
         <input id="fo" value="{{ fo }}" name="fo"/>
         <input id="fc" value="{{ fc }}" name="fc"/>
         <input id="atomdots" value="{{ atomdots }}" name="atomdots"/>
         <input id="posdots" value="{{ posdots }}" name="posdots"/>
         <input id="navdis" value="{{ navdis }}" name="navdis"/>
         <input id="navigate_slice" value="x" name="navigate"/>
+        <input id="neighbours" value="N" name="neighbours"/>
+        <!--pure visual-->
         {{value_len}}
         {{value_check}}
     </p>
@@ -115,7 +115,7 @@ slice
         <td style="padding:10px !important">    
             <table style="padding:10px !important">    
                 <tr style="padding:10px !important">    
-                    <th width="35%">
+                    <th width="15%">
                         <a href='https://www.ebi.ac.uk/pdbe/entry-files/pdb{{pdb_code}}.ent' target="_blank">Browse atoms</a>
                     </th>                                                                                
                     <td>                        
@@ -125,7 +125,8 @@ slice
                     </td>
                     <th>aa</th>
                     <td><button class="button button1"  type="submit">update (x,y,z)</button></td>
-                    <th>dis</th>
+                    <th>distance</th>
+                    <td colspan="5"><button type="submit" class="button button1" onclick="addNaybs()">show neighbours</button></td>
                 </tr>
                 <tr>
                     <th>Central</th>
@@ -149,16 +150,28 @@ slice
                     <td>{{ disp }}</td>
                 </tr>
                 <tr>
-                    <td colspan="5"><hr/></td>
+                    <td colspan="6"><hr/></td>
                 </tr>
                 <tr>
-                    <th style=""> Derivative:</th>
-                    <td style="" colspan="4">                      
-                        <button onclick="return ChangeDeriv('density')" class="button button1" type="submit">density</button>
-                        <button onclick="return ChangeDeriv('radient')" class="button button1" type="submit">radient</button>                                
-                        <button onclick="return ChangeDeriv('laplacian')" class="button button1" type="submit">laplacian</button>
-                        <button onclick="return ChangeDeriv('three')" class="button button1" type="submit">all three</button>                        
-                    </td>
+                    <table>
+                        <tr>                            
+                            <th style=""> Derivative:</th>
+                            <td style="" colspan="2">                      
+                                <button onclick="return ChangeDeriv('density')" class="button button1" type="submit">density</button>
+                                <button onclick="return ChangeDeriv('radient')" class="button button1" type="submit">radient</button>                                
+                                <button onclick="return ChangeDeriv('laplacian')" class="button button1" type="submit">laplacian</button>
+                                <button onclick="return ChangeDeriv('three')" class="button button1" type="submit">all three</button>                        
+                            </td>
+                            <th style="width:5px"></th>
+                            <th style=""> Interpolation:</th>
+                            <td style="" colspan="2">                      
+                                <button onclick="return ChangeInterp('nearest')" class="button button1" type="submit">nearest</button>
+                                <button onclick="return ChangeInterp('linear')" class="button button1" type="submit">linear</button>                                
+                                <button onclick="return ChangeInterp('cubic')" class="button button1" type="submit">cubic</button>
+                                <button onclick="return ChangeInterp('bspline')" class="button button1" type="submit">bspline</button>                        
+                            </td>
+                        </tr>
+                    </table>
                 </tr>                
             </form>                
             </table>        
@@ -179,7 +192,7 @@ slice
                 <td style="width:10%;">Floor%</td>
                 <td style="width:40%"><input oninput="MaxMinCentred('MinLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinLeft"></td>                
                 <td style="width:10%">Cap%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MaxLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxLeft"></td>        
+                <td style="width:40%"><input oninput="MaxMinCentred('MaxLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxLeft"></td>                        
             </tr>
         </table>    
     </th>
@@ -194,7 +207,7 @@ slice
                 <td style="width:10%;">Floor%</td>
                 <td style="width:40%"><input oninput="MaxMinCentred('MinCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
                 <td style="width:10%">Cap%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MaxCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>        
+                <td style="width:40%"><input oninput="MaxMinCentred('MaxCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>                        
             </tr>
         </table>    
     </th>    
@@ -255,18 +268,38 @@ slice
 </p>
 <!-- page functions -->
 <script>
+    function addNaybs(){
+        try{            
+            document.getElementById("neighbours").value = "Y";
+        }catch(err){
+            alert("change naybs:" + err.message)
+        }
+        return true;
+    }
+</script>
+<script>
     function ChangeDeriv(deriv){
         try{            
             document.getElementById("deriv_slice").value = deriv;                                
         }catch(err){
-            alert(err.message)
+            alert("change deriv:" + err.message)
+        }
+        return true;
+    }
+</script>
+<script>
+    function ChangeInterp(interp){
+        try{            
+            document.getElementById("interp_slice").value = interp;                                
+        }catch(err){
+            alert("change deriv:" + err.message)
         }
         return true;
     }
 </script>
 <script>
     function makePlotSliceP(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
-        try{                                    
+        try{            
             var cplot = document.getElementById(plot_id).value;
             var cbar = document.getElementById(bar_id).value;
             var chue = document.getElementById(hue_id).value;
@@ -291,9 +324,11 @@ slice
             var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
             var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
             var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+            var naybs = "{{ nayb_mat}}";
+            //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
         }catch(err){
-            alert(err.message)
+            alert("make slice p:" + err.message)
         }
     }
 </script>
@@ -323,10 +358,12 @@ slice
             var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
             var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
             var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
-            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');    
+            var naybs = "{{ nayb_mat}}";
+            //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
         }catch(err){
-            alert(err.message)
+            alert("make slice b:" + err.message)
         }
     }
 </script>
@@ -364,10 +401,12 @@ slice
             var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
             var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
             var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
-            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');     
+            var naybs = "{{ nayb_mat}}";
+            //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
         }catch(err){
-            alert(err.message)
+            alert("make slice h:" + err.message)
         }
     }
 </script>
@@ -388,7 +427,7 @@ slice
                 ChangeMaxMin(val,-1);
             }
         }catch(err){
-            alert(err.message)
+            alert("max min centred:" + err.message)
         }
     }    
     function ChangeMaxMin(imin,imax){        
@@ -416,31 +455,37 @@ slice
             var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
             var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
             var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
-            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
-            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+            var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');        
+            var naybs = "{{ nayb_mat }}";
+            //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
+            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
         }catch(err){
-            alert(err.message)
+            alert("change max min:" + err.message)
         }
     }
 </script>
 <!-- page refresh-->
 <script>
-    try{
-        var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');    
-        var mat_rad = jQuery.parseJSON('{{ radient_mat|escapejs }}');    
+    //myFunction()
+    try{         
+        var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');            
+        var mat_rad = jQuery.parseJSON('{{ radient_mat|escapejs }}');            
         var mat_lap = jQuery.parseJSON('{{ laplacian_mat|escapejs }}');
-        // atom and pos dots are the same for all slcies
+        // atom and pos dots are the same for all slcies        
         var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
         var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
         var posi_dotsX = jQuery.parseJSON('{{ posi_dotsX|escapejs }}');
         var posi_dotsY = jQuery.parseJSON('{{ posi_dotsY|escapejs }}');          
         var negi_dotsX = jQuery.parseJSON('{{ negi_dotsX|escapejs }}');
-        var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
-        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
-        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
-        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY);
+        var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');           
+        var naybs = "{{ nayb_mat}}";        
+        //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
+        
+        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
     }catch(err){
-        alert(err.message);
+        alert("page init:" + err.message);
     }
 </script>
 <script>

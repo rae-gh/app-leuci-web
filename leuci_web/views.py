@@ -21,6 +21,7 @@ from . import sessiondata as sd
 from .classes import admin as adm
 import leuci_xyz.vectorthree as v3 
 from leuci_xyz import spacetransform as space
+from leuci_map import mapsmanager as mapss
 
 # Create your views here.
 def index(request):
@@ -58,83 +59,95 @@ def get_user(request):
     
         
 async def explore(request):
-    context = {
-        'pdb_code': "", 
-        'em_code': "", 
-        'resolution':"", 
-        'ebi_link':"",
-        'em_link':"",
-        'exp_method':"",
-        'map_header':{},
-        'message':"",
-        'header_string':"",
-         }                
-       
-    t1 = datetime.datetime.now()
-    gl_user, gl_ip = await get_user(request)            
-    pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
-    if pdb_code == "":
+    try:
+        context = {
+            'pdb_code': "", 
+            'em_code': "", 
+            'resolution':"", 
+            'ebi_link':"",
+            'em_link':"",
+            'exp_method':"",
+            'map_header':{},
+            'message':"",
+            'header_string':"",
+            }                
+        
+        t1 = datetime.datetime.now()
+        gl_user, gl_ip = await get_user(request)            
+        pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
+        if pdb_code == "":
+            return render(request, 'explore.html', context)
+        print(pdb_code, on_file, in_loader, in_interp)        
+        context['pdb_code'] = pdb_code    
+        print("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
+        logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
+        
+        if not on_file:
+            print("Not on file",pdb_code)
+            context['message'] = "Downloading... "        
+            loop = asyncio.get_event_loop()
+            async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
+            loop.create_task(async_function(request,pdb_code,gl_ip))
+            print("Time taken to start download",datetime.datetime.now()-t1)
+            return render(request, 'explore.html', context)
+        elif not in_interp or not in_loader or mobj == None :        
+            context['message'] = ""       
+            mload = sd.upload_ed_header(pdb_code,gl_ip)
+            mobj = mload.mobj
+                                                    
+        if mobj != None:        
+            print(mobj)
+            context['resolution'] = mobj.resolution
+            context['ebi_link'] = mobj.ebi_link
+            context['em_link'] = mobj.em_link
+            context['em_code'] = mobj.em_code
+            context['exp_method'] = mobj.exp_method            
+            #if "x-ray" in mobj.exp_method:        
+            context['header_string'] = mobj.header_as_string            
+            print("rendering...")
+        context["full_url"] = await sd.get_url(request,context, ["pdb_code"])    
+        print("Time taken",datetime.datetime.now()-t1)
         return render(request, 'explore.html', context)
-    print(pdb_code, on_file, in_loader, in_interp)        
-    context['pdb_code'] = pdb_code    
-    print("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
-    logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
-    
-    if not on_file:
-        context['message'] = "Downloading... "        
-        loop = asyncio.get_event_loop()
-        async_function = sync_to_async(sd.download_ed, thread_sensitive=False)
-        loop.create_task(async_function(request,pdb_code,gl_ip))
-        print("Time taken to start download",datetime.datetime.now()-t1)
-        return render(request, 'explore.html', context)
-    elif not in_interp or not in_loader or mobj == None :        
-        context['message'] = ""       
-        mload = sd.upload_ed_header(pdb_code,gl_ip)
-        mobj = mload.mobj
-                                                
-    if mobj != None:        
-        print(mobj)
-        context['resolution'] = mobj.resolution
-        context['ebi_link'] = mobj.ebi_link
-        context['em_link'] = mobj.em_link
-        context['em_code'] = mobj.em_code
-        context['exp_method'] = mobj.exp_method            
-        #if "x-ray" in mobj.exp_method:        
-        context['header_string'] = mobj.header_as_string            
-        print("rendering...")
-    context["full_url"] = await sd.get_url(request,context, ["pdb_code"])    
-    print("Time taken",datetime.datetime.now()-t1)
-    return render(request, 'explore.html', context)
+    except Exception as e:
+        context = {}
+        context["message"] = str(e)                    
+        return render(request, 'error.html', context)
                         
 async def admin(request):
-    act = ""
-    if 'act' in request.POST:
-        act = request.POST.get('act')
-    
-    context = {}
-    gl_user, gl_ip = await get_user(request)
-    pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
-    adm_fetch = adm.AdminClass()    
-    log_all = False
-    if act == "data_show2":
-        log_all = True
+    try:
+        act = ""
+        if 'act' in request.POST:
+            act = request.POST.get('act')
+        
+        context = {}
+        gl_user, gl_ip = await get_user(request)
+        pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)            
+        adm_fetch = adm.AdminClass()    
+        log_all = False
+        if act == "data_show2":
+            log_all = True
 
-    if act == "logs_delete":
-        context['logs_formatted'] = adm_fetch.delete_logs()
-    else:
-        context['logs_formatted'] = adm_fetch.show_logs(formatted=True,all=log_all)
-    
-    if act == "data_delete":
-        context['data_formatted'] = adm_fetch.delete_data()
-    else:
-        context['data_formatted'] = adm_fetch.show_data(formatted=True)
+        if act == "logs_delete":
+            context['logs_formatted'] = adm_fetch.delete_logs()
+        else:
+            context['logs_formatted'] = adm_fetch.show_logs(formatted=True,all=log_all)
         
-    context["pdb_code"]= pdb_code
-        
-    context["json"] = sd.get_store_info(gl_ip)
-                                
-    print("rendering...")
-    return render(request, 'admin.html', context)
+        if act == "data_delete":
+            context['data_formatted'] = adm_fetch.delete_data()
+        else:
+            context['data_formatted'] = adm_fetch.show_data(formatted=True)
+            
+        context["pdb_code"]= pdb_code
+            
+        #context["json"] = sd.get_store_info(gl_ip)
+        context["json"] = mapss.MapsManager().print_maps()
+                                    
+        print("rendering...")
+        return render(request, 'admin.html', context)
+    except Exception as e:
+        context = {}
+        context["message"] = str(e)                    
+        return render(request, 'error.html', context)
 
 #https://plotly.com/python-api-reference/generated/plotly.graph_objects.Contour.html?highlight=contour#plotly.graph_objects.Contour
 async def cross(request):    
@@ -221,17 +234,29 @@ async def projection(request):
             sd.upload_ed(pdb_code,gl_ip)
             pdb_code, nav,on_file, in_loader, in_interp, mfunc = await sd.get_pdbcode_and_status(request,ret="FUNC")        
             
-    if make_slice: # then it is in store and we are going to return a slice view        
-        mobj = mfunc.mobj
-        pobj = mfunc.pobj
-        xs,ys,zs,vs = mfunc.get_atoms_projection("linear",log_level=1)          
+    if make_slice: # then it is in store and we are going to return a slice view                        
+        xs,ys,zs,vs,xx,yy,zz = mfunc.get_atoms_projection("linear",log_level=1)
         context["atoms_x"] = xs
         context["atoms_y"] = ys
         context["atoms_z"] = zs
         context["atoms_v"] = vs
-        context["proj_xy"] = mfunc.get_map_projection("xy").tolist()
+        context["proj_xy"] = mfunc.get_map_projection("xy").tolist()        
         context["proj_yz"] = mfunc.get_map_projection("yz").tolist()
-        context["proj_zx"] = mfunc.get_map_projection("zx").tolist()       
+        context["proj_zx"] = mfunc.get_map_projection("zx").tolist()               
+        #context["proj_xy_atoms"] = mfunc.get_map_projection("xy",xx[0]-1,xx[1]+1,yy[0]-1,yy[1]+1).tolist()        
+        #context["proj_yz_atoms"] = mfunc.get_map_projection("yz",yy[0]-1,yy[1]+1,zz[0]-1,zz[1]+1).tolist()
+        #context["proj_zx_atoms"] = mfunc.get_map_projection("zx",xx[0]-1,xx[1]+1,zz[0]-1,zz[1]+1).tolist()        
+        context["proj_xy_atoms"] = mfunc.get_map_projection("xy",xx[0],xx[1],yy[0],yy[1]).tolist()        
+        context["proj_yz_atoms"] = mfunc.get_map_projection("yz",yy[0],yy[1],zz[0],zz[1]).tolist()
+        context["proj_zx_atoms"] = mfunc.get_map_projection("zx",xx[0],xx[1],zz[0],zz[1]).tolist()        
+        context["empty"] = []  
+        context["x_xy"] = [*range(yy[0],yy[1])]  
+        context["y_xy"] = [*range(xx[0],xx[1])]  
+        context["x_yz"] = [*range(zz[0],zz[1])]  
+        context["y_yz"] = [*range(yy[0],yy[1])]  
+        context["x_zx"] = [*range(zz[0],zz[1])]  
+        context["y_zx"] = [*range(xx[0],xx[1])]   
+
         context["full_url"] = await sd.get_url(request, context,["pdb_code"])    
         return render(request, 'projection.html', context)
 
@@ -241,7 +266,8 @@ async def slice(request):
     ts = datetime.datetime.now()
     try:
         context = {}                
-        context['message'] = ""    
+        context['message'] = "" 
+        context["messages"] = []
         gl_user, gl_ip = await get_user(request)
         is_get = await sd.is_get_request(request)
         if is_get:
@@ -302,8 +328,7 @@ async def slice(request):
                     width = int(settings_dic["width"])
                     samples = int(settings_dic["samples"])
                     interp = settings_dic["interp"]
-                    deriv = settings_dic["deriv"]
-                    degree = settings_dic["degree"]
+                    deriv = settings_dic["deriv"]                    
                     fo = settings_dic["fo"]
                     fc = settings_dic["fc"]
 
@@ -316,9 +341,9 @@ async def slice(request):
                                                                     
                     nav = settings_dic["navigate"]                    
                     # the key to finding the slice is the central-linear-planar coordinates                    
-                    if nav == "x": #then we use the given coordinates            
+                    if nav.upper() == "X": #then we use the given coordinates            
                         pass       
-                    elif nav[:2] == "A:":#if nav == "a:" then we use the givern atoms, 0 the given ones, -1 and +1 obvious                                                                                 
+                    elif nav[:2].upper() == "A:":#if nav == "a:" then we use the givern atoms, 0 the given ones, -1 and +1 obvious                                                                                 
                         offset = int(nav[2:])                        
                         print("offset",offset)
                         if offset != 0:
@@ -384,13 +409,21 @@ async def slice(request):
 
                     print("Time taken to get prepare to get slice",datetime.datetime.now()-t1)
                     t1 = datetime.datetime.now()
+
+                    den_rad_lap = ["mv3","mv5","cubic","bspline"]
+                    den_rad = ["mv1","linear"]
+                    den_only = ["nearest","numpest"]
+
                                         
                     if deriv == "three":
-                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree)
-                        if settings_dic["interp"] != "nearest":
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree)
-                            if settings_dic["interp"] != "linear":
-                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree)
+                        #vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
+                        if settings_dic["interp"] not in den_only:
+                            #rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
+                            if settings_dic["interp"] in den_rad_lap:
+                                #laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
                         context["density_mat"] = vals
                         context["radient_mat"] = rads
                         context["laplacian_mat"] = laps                                                                                    
@@ -401,23 +434,34 @@ async def slice(request):
                         context["three_blocknone"] = "display:none;visibility: collapse"
                         context["other_blocknone"] = "display:none;visibility: collapse"                        
                         if deriv == "density":
-                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree)
+                            #vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
                             context["density_mat"] = vals
                             context["den_blocknone"] = ""
                             context["one_blocknone"] = ""
                         elif deriv == "radient":
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree)
+                            #rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
                             context["radient_mat"] = rads
                             context["rad_blocknone"] = ""
                             context["other_blocknone"] = ""
                         elif deriv == "laplacian":
-                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree)
+                            #laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
+                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
                             context["laplacian_mat"] = laps
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
                     
-                    print("Time taken to get get slice",datetime.datetime.now()-t1)
-                    t1 = datetime.datetime.now()
+                    print("Time taken to get slice",datetime.datetime.now()-t1)
+                    t1 = datetime.datetime.now()                    
+                    nybs = settings_dic["naybs"]
+                    if nybs == "Y":
+                        naybs = mfunc.get_slice_neighbours(central,linear,planar,width,samples,[0,0.5])
+                        print("Time taken to get neighbours",datetime.datetime.now()-t1)
+                        t1 = datetime.datetime.now()
+                    else:
+                        naybs = [[]]
+                    context["nayb_mat"] = naybs                                                            
                     ## Finally create the position dots if we want them
                     pdots = settings_dic["posdots"]
                     adots = settings_dic["atomdots"]                    
@@ -458,11 +502,14 @@ async def slice(request):
                                     context["negi_dotsX"].append(posDp.B)
                                     context["negi_dotsY"].append(posDp.A)
                                                                                                                               
+                    print("Density MAT------")
+                    #print(context["density_mat"])
                     print("Time taken to add dots",datetime.datetime.now()-t1)
                     print("rendering... took",datetime.datetime.now()-ts)                    
                     context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
                     strmsg = "INFO:\t" + gl_ip + "\t" + pdb_code + ' slice time taken '+str(datetime.datetime.now())+' hours is '+ str(datetime.datetime.now()-ts)
                     logging.info(strmsg)
+                    context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
                     return render(request, 'slice.html', context)
                     
                 except Exception as e:
@@ -472,9 +519,10 @@ async def slice(request):
         print("Time taken",datetime.datetime.now()-t1)
         print("rendering...")
         context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
+        context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
         return render(request, 'slice.html', context)
     except Exception as e:
-        context["message"] = str(e)        
+        context["message"] = str(e)                
         return render(request, 'error.html', context)
 
     

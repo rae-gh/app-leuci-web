@@ -36,7 +36,7 @@ function makeCross(div_id,slice,min_per, max_per,show_bar){
       colorbar: col_bar, 
       z: slice, 
       type: "heatmap",   
-      hovertemplate:'%{z:.4f}',
+      hovertemplate:'......%{z:.4f}',
       zmin:vmin,
       zmax:vmax,
       name:"",

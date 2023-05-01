@@ -27,3 +27,13 @@ file downloads: https://www.youtube.com/watch?v=r_6VQozZD8M
 
 ## Maths
 https://www.ch.imperial.ac.uk/rzepa/blog/?p=2183 eigen values, and laplacian surface add to visualisation using jsmol
+
+## Documentation
+https://packaging.python.org/en/latest/tutorials/creating-documentation/
+
+## c++
+https://www.matecdev.com/posts/cpp-call-from-python.html
+
+## Problems
+https://stackoverflow.com/questions/40582423/invalid-http-host-header
+

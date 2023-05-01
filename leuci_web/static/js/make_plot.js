@@ -1,9 +1,10 @@
-function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY){  
-  try{  
-    //x = [0,1,2]
-    //y = [0,1,2]
-    //mat = [[1,2,3],[3,2,1],[0,-1,5]];
-    
+function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs){
+  try{      
+    // if the plot has no data in there is no point in continuing
+    if (mat.length <= 1){      
+      return;
+    }
+            
     var data_scatter_pos_zero = {        
       x: zero_dotsX,
       y: zero_dotsY,
@@ -69,10 +70,7 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
 
     vmin = vmin * smin/100;
     vmax = vmax * smax/100;
-
-    //alert(vmin)
-    //alert(vmax)
-    
+        
     var size = (vmax - vmin) / 20;
     var f0 = (0 - vmin) / (vmax - vmin);
     cs_scl_br = [[0, 'CornflowerBlue'], [f0, 'Snow'], [1, 'Crimson']];
@@ -104,7 +102,32 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     }else{      
       cs_scl = cs_scl_gbr;
     }
-
+        
+    
+    var annos = [];
+    var annosA = naybs.split("[");    
+    for (var i = 0; i < annosA.length; i++){
+      if (annosA[i].length > 2){
+        annosA[i] = annosA[i].replace("[","");
+        annosA[i] = annosA[i].replace("]","");        
+        annos.push(annosA[i])
+      }            
+    }
+    for (var i = 0; i < annos.length; i++){      
+      annos[i] = annos[i].split(",");    
+    }
+    
+    if (annos.length != mat.length){
+      var annos = [];
+      for (var i = 0; i < mat.length; i++){
+        var row = [];
+        for (var j = 0; j < mat.length; j++){
+          row.push("");
+        }
+        annos.push(row);
+      }
+    }
+            
     var data_slice = {      
       //x:mat[0],
       //y:mat[0],
@@ -112,7 +135,9 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
       showscale: cbar,
       colorbar: col_bar, 
       z: mat, 
-      hovertemplate:'%{z:.4f}',
+      text:annos,   
+      hovertemplate:'......%{z:.4f}<br>%{text}',
+      hoverlabel:{bgcolor:'rgba(1,1,1,0.05)',align:'left'},     
       type: plot_type,          
       line: { width: 0.5, color: 'Gray' },
       name: "",
@@ -144,7 +169,7 @@ function makePlot(mat, div_name, plot_type,cbar,hue,smin,smax,zero_dotsX,zero_do
     };
       
 
-    Plotly.newPlot(div_name, data,layout,config);    
+    Plotly.newPlot(div_name, data,layout,config,{});    
   }catch(err){
     alert("makeplot:" + err.message);
   }

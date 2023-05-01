@@ -14,7 +14,7 @@ class AdminClass(object):
     def __init__(self):
         self.data_dir = str(Path(__file__).resolve().parent.parent )+ "/data/"
         self.data_dic = {}
-        self.log_file = str(BASE_DIR) + '/leucilog_'+str(settings.DEBUG) +'.log'
+        self.log_file = str(BASE_DIR) + '/leuci_web/leucilog_'+str(settings.DEBUG) +'.log'
         
 
     def delete_logs(self):

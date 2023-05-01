@@ -2,34 +2,30 @@
 # To do list
 (notes additional to github issues)
 
-## Goal for 17/3/24
-- MOST URGENT is sort out the upload and download chain of command. If downloading DO NOT redownload. If uploading DONOT re upload. Make a class checker for these 2 things - downloaded, uploaded, is_downloading, is_uploading and use that in the message status and DO NOT do them again.
-- add a wrapping funciton to leuci-maps to reduce the code to make the plots
-- make colab page for all the examples, here: https://colab.research.google.com/drive/12_lLJV7MgaRNoQbELvkQ2BEqWirGPi74#scrollTo=_ouMRxVlnO0z
-- I have got the angles the wrong way round!!!
-- add in the python download button on slice
-- more hues?
-- make the python invariant creatable from leuci-pol (take from psu multivarse)
-- add 5th degree option
+## Goal for 20/4/24
+- fix the problem with the projection on only the atoms area, started making a funciton where the projection takes a range, it works simply in leuci-pol
+- speed it up
+- make it work peridically
 
 
+ 
 ## Bugs
-- Don't start uploading again if it is already uploading - check existence of file, if it is there, don't start again (can be deleted from admin)
-- If I navigate off the end of the list for the atoms I get an error
+- when I untoggle atoms in projection I lose the crystal for the second row
+
+## For 20/4/23
+- I have messed about with storage and created a new thread sytem in MapsManager which needs integrating in Slice
+- Then I can replicate the speed of a slice view in leuci-map and debug
+
 
 ## TO DO
-- make density slider on projection and cross seciotn
-- Numpy migration - delete old code, serious testing, and also change all the angles in v3
-- visual elements need to be in state so eg hue, bar, plot, three type don;t change
-- Add navigation to the spacetransform class
+
  - use jax and numba and @JIT decorator
     https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html
     https://numba.pydata.org/numba-doc/latest/user/jit.html
 - add a reverse hue option
 - Clear Memory in admin needs to be implemented
 - Document leuci-map with readthedocs
-- Projection
-- Raw matrix slice - cross sections
+
 - in leuci-map add "get nearest maxima" or minima
 - in leuci-map add adjust pdb file to maxima !!!!!
 - create triv-div library: I had an idea that resampling could be used on a density map itself. Mark suggests comparing pseudo density and a real structure and thus resurrecting Alcraft-Williams divergence! No idea if this will work but it feels like a relevant idea. In fact, it is perfect for AW-Trivial Divergence. ALso can be used to compare structures.
@@ -39,12 +35,7 @@
   """Generates the RGB image and depth map from model prediction.
     Args:
         model: The MLP model that is trained to predict the rgb and
-            volume density of the volumetric scene.
-        rays_flat: The flattened rays that serve as the input to
-            the NeRF model.
-        t_vals: The sample points for the rays.
-        rand: Choice to randomise the sampling strategy.
-        train: Whether the model is in the training or testing phase.
+            volume density of the volumetric scene.        
     Returns:
         Tuple of rgb image and depth map.
     """
@@ -64,8 +55,23 @@
 
 
 ## DONE
+- I have got the angles the wrong way round!!!
+- Projection
+- Raw matrix slice - cross sections
+- make density slider on projection and cross seciotn
+- Numpy migration - delete old code, serious testing, and also change all the angles in v3
+- visual elements need to be in state so eg hue, bar, plot, three type don;t change
+- Add navigation to the spacetransform class
+- Don't start uploading again if it is already uploading - check existence of file, if it is there, don't start again (can be deleted from admin)
+- If I navigate off the end of the list for the atoms I get an error
 
 ## Goal for 17/3/24 - done
+- MOST URGENT is sort out the upload and download chain of command. If downloading DO NOT redownload. If uploading DONOT re upload. Make a class checker for these 2 things - downloaded, uploaded, is_downloading, is_uploading and use that in the message status and DO NOT do them again.
+- add a wrapping funciton to leuci-maps to reduce the code to make the plots
+- make colab page for all the examples, here: https://colab.research.google.com/drive/12_lLJV7MgaRNoQbELvkQ2BEqWirGPi74#scrollTo=_ouMRxVlnO0z
+- add in the python download button on slice
+- make the python invariant creatable from leuci-pol (take from psu multivarse)
+- add 5th degree option
 - added projections
 - added cross sections
 - hook in bspline to web

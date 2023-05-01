@@ -132,3 +132,9 @@ dmypy.json
 leuci_web/data/*.ccp4
 leuci_web/data/*.pdb
 leuci_web/data/*.gz
+leuci_web/data/*.txt
+leuci_web/staticfiles/*
+leuci_web/staticfiles/*.*
+leuci_web/staticfiles/*.js
+leuci_web/static/js/*.js
+

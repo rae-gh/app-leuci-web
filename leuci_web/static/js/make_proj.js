@@ -1,5 +1,5 @@
 
-function makeProjection(proj_xy,atoms_x,atoms_y,atoms_v,div_id,proj,atoms,min_per, max_per){
+function makeProjection(proj_xy,atoms_x,atoms_y,atoms_v,div_id,proj,atoms,min_per, max_per,x_ax,y_ax){
   try{
     //alert(proj + " " + atoms)  
     
@@ -28,13 +28,15 @@ function makeProjection(proj_xy,atoms_x,atoms_y,atoms_v,div_id,proj,atoms,min_pe
     }else{
       cs_scl_gbr = [[0,'Grey'],[f0, 'Snow'], [f1, 'LightBlue'], [f2, 'CornflowerBlue'], [f3, 'Crimson'], [1, 'rgb(100, 0, 0)']];
     }
-        
+            
     var trace_slice = {            
       colorscale: cs_proj, 
       showscale: false,      
       z: proj_xy, 
+      x: x_ax,
+      y:y_ax,
       type: "heatmap",
-      hovertemplate:'%{z:.4f}',
+      hovertemplate:'......%{z:.4f}',
       zmin:vmin,
       zmax:vmax,
       name:""
