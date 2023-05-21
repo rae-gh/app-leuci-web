@@ -6,7 +6,6 @@ gunicorn
 httpx
 plotly
 whitenoise
-matplotlib
 numpy
 pandas
 biopython
@@ -14,3 +13,4 @@ scipy
 leuci-xyz
 leuci-pol
 leuci-map
+matplotlib

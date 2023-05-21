@@ -62,6 +62,22 @@ slice
         {{value_len}}
         {{value_check}}
     </p>
+    <p style="display:none;visibility:collapse">    
+        <!-- HIDDEN VALUES -->
+        <input id="den_plot_name" value="{{ den_plot_name }}" name="den_plot_name"/>
+        <input id="rad_plot_name" value="{{ rad_plot_name }}" name="rad_plot_name"/>
+        <input id="lap_plot_name" value="{{ lap_plot_name }}" name="lap_plot_name"/>
+        <input id="den_bar_name" value="{{ den_bar_name }}" name="den_bar_name"/>
+        <input id="rad_bar_name" value="{{ rad_bar_name }}" name="rad_bar_name"/>
+        <input id="lap_bar_name" value="{{ lap_bar_name }}" name="lap_bar_name"/>
+        <input id="den_hue_name" value="{{ den_hue_name }}" name="den_hue_name"/>
+        <input id="rad_hue_name" value="{{ rad_hue_name }}" name="rad_hue_name"/>
+        <input id="lap_hue_name" value="{{ lap_hue_name }}" name="lap_hue_name"/>    
+        <input id="den_min_percent" value="{{ den_min_percent }}" name="den_min_percent"/>
+        <input id="den_max_percent" value="{{ den_max_percent }}" name="den_max_percent"/>    
+        <input id="den_min_val" value="{{ den_min_val }}" name="den_min_val"/>
+        <input id="den_max_val" value="{{ den_max_val }}" name="den_max_val"/>    
+    </p>
 <table style="padding:10px !important; align-content:center !important; text-align:center !important;" onMouseOver="button.backgroundColor='#F8F8F8'" onMouseOut="button.backgroundColor='#FFFFFF'">
     <tr style="padding:10px !important">    
         <td width="18%" style="padding:10px !important">    
@@ -189,10 +205,12 @@ slice
     <th width="400px">
         <table style="align-content:center;text-align:center;align-items:center;">
             <tr style="align-content:center;text-align:center;align-items:center;">
-                <td style="width:10%;">Floor%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MinLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinLeft"></td>                
-                <td style="width:10%">Cap%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MaxLeft')"  type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxLeft"></td>                        
+                <td style="width:8%;">{{ den_min_val }}:</td>
+                <td style="width:8%;">Floor%</td>
+                <td style="width:34%"><input oninput="MaxMinCentred('MinLeft')"  type="range" min=0 max=100 value={{ den_min_percent }} step="1" style="direction:ltr" id="rangeValueMinLeft"></td>                
+                <td style="width:8%">Cap%</td>
+                <td style="width:34%"><input oninput="MaxMinCentred('MaxLeft')"  type="range" min=0 max=100 value={{ den_max_percent }} step="1" style="direction:ltr" id="rangeValueMaxLeft"></td>                        
+                <td style="width:8%;">:{{ den_max_val }}</td>
             </tr>
         </table>    
     </th>
@@ -204,10 +222,12 @@ slice
     <th width="400px">
         <table style="align-content:center;text-align:center;align-items:center;">
             <tr style="align-content:center;text-align:center;align-items:center;">
-                <td style="width:10%;">Floor%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MinCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
-                <td style="width:10%">Cap%</td>
-                <td style="width:40%"><input oninput="MaxMinCentred('MaxCen')" type="range" min=0 max=100 value=100 step="1" style="direction:ltr" id="rangeValueMaxCen"></td>                        
+                <td style="width:8%;">{{ den_min_val }}:</td>
+                <td style="width:8%;">Floor%</td>
+                <td style="width:34%"><input oninput="MaxMinCentred('MinCen')"  type="range" min=0 max=100 value={{ den_min_percent }} step="1" style="direction:ltr" id="rangeValueMinCen"></td>                
+                <td style="width:8%">Cap%</td>
+                <td style="width:34%"><input oninput="MaxMinCentred('MaxCen')"  type="range" min=0 max=100 value={{ den_max_percent }} step="1" style="direction:ltr" id="rangeValueMaxCen"></td>                        
+                <td style="width:8%;">:{{ den_max_val }}</td>
             </tr>
         </table>    
     </th>    
@@ -254,18 +274,7 @@ slice
     </tr>    
 </table>
 <!-- hiden values for the javascript display-->
-<p style="display:none;visibility:collapse">
-    <!-- HIDDEN VALUES -->
-    <input id="den_plot_name" value='contour' name="den_plot_name"/>
-    <input id="rad_plot_name" value='heatmap' name="rad_plot_name"/>
-    <input id="lap_plot_name" value='contour' name="lap_plot_name"/>
-    <input id="den_bar_name" value='N' name="den_bar_name"/>
-    <input id="rad_bar_name" value='N' name="rad_bar_name"/>
-    <input id="lap_bar_name" value='N' name="lap_bar_name"/>
-    <input id="den_hue_name" value='GBR' name="den_hue_name"/>
-    <input id="rad_hue_name" value='BW' name="rad_hue_name"/>
-    <input id="lap_hue_name" value='BR' name="lap_hue_name"/>    
-</p>
+
 <!-- page functions -->
 <script>
     function addNaybs(){
@@ -326,7 +335,12 @@ slice
             var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');          
             var naybs = "{{ nayb_mat}}";
             //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+            var den_min_percent = document.getElementById("den_min_percent").value;
+            var den_max_percent = document.getElementById("den_max_percent").value;
+            var den_min_val = document.getElementById("den_min_val").value;
+            var den_max_val = document.getElementById("den_max_val").value;
+
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val,den_min_val,den_max_val);
         }catch(err){
             alert("make slice p:" + err.message)
         }
@@ -361,7 +375,12 @@ slice
             var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');    
             var naybs = "{{ nayb_mat}}";
             //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+            var den_min_percent = document.getElementById("den_min_percent").value;
+            var den_max_percent = document.getElementById("den_max_percent").value;
+            var den_min_val = document.getElementById("den_min_val").value;
+            var den_max_val = document.getElementById("den_max_val").value;
+
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
         }catch(err){
             alert("make slice b:" + err.message)
         }
@@ -404,7 +423,12 @@ slice
             var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');     
             var naybs = "{{ nayb_mat}}";
             //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
-            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+            var den_min_percent = document.getElementById("den_min_percent").value;
+            var den_max_percent = document.getElementById("den_max_percent").value;
+            var den_min_val = document.getElementById("den_min_val").value;
+            var den_max_val = document.getElementById("den_max_val").value;
+
+            makePlot(mat_den, div_id, cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
         }catch(err){
             alert("make slice h:" + err.message)
         }
@@ -414,15 +438,19 @@ slice
     function MaxMinCentred(pos){        
         try{
             if (pos == "MaxCen"){
+                document.getElementById("den_max_percent").value = document.getElementById("rangeValueMaxCen").value;
                 var val = document.getElementById("rangeValueMaxCen").value;
                 ChangeMaxMin(-1,val);
             }else if (pos == "MaxLeft"){
+                document.getElementById("den_max_percent").value = document.getElementById("rangeValueMaxLeft").value;
                 var val = document.getElementById("rangeValueMaxLeft").value;
                 ChangeMaxMin(-1,val);
             }else if (pos == "MinCen"){
+                document.getElementById("den_min_percent").value = document.getElementById("rangeValueMinCen").value;
                 var val = document.getElementById("rangeValueMinCen").value;
                 ChangeMaxMin(val,-1);
             }else if (pos == "MinLeft"){
+                document.getElementById("den_min_percent").value = document.getElementById("rangeValueMinLeft").value;
                 var val = document.getElementById("rangeValueMinLeft").value;
                 ChangeMaxMin(val,-1);
             }
@@ -458,7 +486,12 @@ slice
             var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');        
             var naybs = "{{ nayb_mat }}";
             //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
-            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+            var den_min_percent = document.getElementById("den_min_percent").value;
+            var den_max_percent = document.getElementById("den_max_percent").value;
+            var den_min_val = document.getElementById("den_min_val").value;
+            var den_max_val = document.getElementById("den_max_val").value;
+            
+            makePlot(mat_den, "slice_density", cplot,cbar=="Y",chue,sMin,sMax,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
         }catch(err){
             alert("change max min:" + err.message)
         }
@@ -480,10 +513,25 @@ slice
         var negi_dotsY = jQuery.parseJSON('{{ negi_dotsY|escapejs }}');           
         var naybs = "{{ nayb_mat}}";        
         //var naybs = jQuery.parseJSON('{{ nayb_mat }}');
-        
-        makePlot(mat_den, "slice_density", "contour",false,"GBR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
-        makePlot(mat_rad, "slice_radient", "heatmap",false,"BW",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
-        makePlot(mat_lap, "slice_laplacian", "contour",false,"BR",100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs);
+
+        var den_plot_name = document.getElementById("den_plot_name").value;
+        var rad_plot_name = document.getElementById("rad_plot_name").value;
+        var lap_plot_name = document.getElementById("lap_plot_name").value;
+        var den_bar_name = document.getElementById("den_bar_name").value;
+        var rad_bar_name = document.getElementById("rad_bar_name").value;
+        var lap_bar_name = document.getElementById("lap_bar_name").value;
+        var den_hue_name = document.getElementById("den_hue_name").value;
+        var rad_hue_name = document.getElementById("rad_hue_name").value;
+        var lap_hue_name = document.getElementById("lap_hue_name").value;
+
+        var den_min_percent = document.getElementById("den_min_percent").value;
+        var den_max_percent = document.getElementById("den_max_percent").value;
+        var den_min_val = document.getElementById("den_min_val").value;
+        var den_max_val = document.getElementById("den_max_val").value;
+                
+        makePlot(mat_den, "slice_density",den_plot_name,den_bar_name=="Y",den_hue_name,den_min_percent,den_max_percent,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
+        makePlot(mat_rad, "slice_radient",rad_plot_name,rad_bar_name=="Y",rad_hue_name,100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
+        makePlot(mat_lap, "slice_laplacian",lap_plot_name,lap_bar_name=="Y",lap_hue_name,100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
     }catch(err){
         alert("page init:" + err.message);
     }

@@ -264,6 +264,18 @@ async def projection(request):
 async def slice(request):
     t1 = datetime.datetime.now()
     ts = datetime.datetime.now()
+    full_url_list = ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"]
+    full_url_list.append("den_plot_name")
+    full_url_list.append("rad_plot_name")
+    full_url_list.append("lap_plot_name")
+    full_url_list.append("den_bar_name")
+    full_url_list.append("rad_bar_name")
+    full_url_list.append("lap_bar_name")
+    full_url_list.append("den_hue_name")
+    full_url_list.append("rad_hue_name")
+    full_url_list.append("lap_hue_name")
+    full_url_list.append("den_min_percent")
+    full_url_list.append("den_max_percent")
     try:
         context = {}                
         context['message'] = "" 
@@ -312,6 +324,7 @@ async def slice(request):
                                 
         if make_slice: # then it is in store and we are going to return a slice view
             mobj = mfunc.mobj
+            is_xray = 'x-ray' in mobj.exp_method
             pobj = mfunc.pobj
             if len(mobj.values) > 0:
                 try:
@@ -331,6 +344,7 @@ async def slice(request):
                     deriv = settings_dic["deriv"]                    
                     fo = settings_dic["fo"]
                     fc = settings_dic["fc"]
+                    print("FoFc=",fo,fc)
 
                     keyc = settings_dic["keyc"]                
                     keyl = settings_dic["keyl"]
@@ -346,15 +360,27 @@ async def slice(request):
                     elif nav[:2].upper() == "A:":#if nav == "a:" then we use the givern atoms, 0 the given ones, -1 and +1 obvious                                                                                 
                         offset = int(nav[2:])                        
                         print("offset",offset)
+                        keyco,keylo,keypo = keyc,keyl,keyp
                         if offset != 0:
-                            keyc = pobj.get_next_key(keyc,offset)
-                            keyl = pobj.get_next_key(keyl,offset)
+                            keyc = pobj.get_next_key(keyc,offset)                            
+                            keyl = pobj.get_next_key(keyl,offset)                            
                             keyp = pobj.get_next_key(keyp,offset)
+                                                
                         print(keyc,keyl,keyp)
+                        if pobj.get_atm_key(keyc) == {} or pobj.get_atm_key(keyc) == None:
+                            keyc = keyco
+                        else:
+                            print(pobj.get_atm_key(keyc))
+                        if pobj.get_atm_key(keyl) == {} or pobj.get_atm_key(keyl) == None:
+                            keyl = keylo
+                        if pobj.get_atm_key(keyp) == {} or pobj.get_atm_key(keyp) == None:
+                            keyp = keypo                        
+                        print("Keys:",keyc,keyl,keyp)
                         cc = pobj.get_coords_key(keyc)
                         cl = pobj.get_coords_key(keyl)
                         cp = pobj.get_coords_key(keyp)
-                        print(cc,cl,cp)
+                        print("Coords:",cc,cl,cp)
+                        keyc,keyl,keyp = keyc,keyl,keyp
                         central = v3.VectorThree().from_coords(cc)
                         linear = v3.VectorThree().from_coords(cl)
                         planar = v3.VectorThree().from_coords(cp)
@@ -370,8 +396,22 @@ async def slice(request):
                                                             
                     atc = pobj.get_atm_key(keyc)                
                     atl = pobj.get_atm_key(keyl)                
-                    atp = pobj.get_atm_key(keyp)                                                
-                    aac,aal,aap = atc["aa"],atl["aa"],atp["aa"]  
+                    atp = pobj.get_atm_key(keyp)
+                    if atc != None and "aa" in atc:
+                        aac = atc["aa"]
+                    else:
+                        aac = "?"
+                    if atl != None and "aa" in atl:
+                        aal = atl["aa"]
+                    else:
+                        aal = "?"
+                    if atp != None and "aa" in atp:
+                        aap = atp["aa"]
+                    else:
+                        aap = "?"
+                    print("aas:", aac,aal,aap)
+                    
+
                     context['nav'] = "x"
                     context["aac"] = aac
                     context["aal"] = aal
@@ -452,13 +492,29 @@ async def slice(request):
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
                     
+                    if not is_xray:
+                        context["fo"] = 1
+                        context["fc"] = 0
+                    context["den_min_val"],context["den_max_val"] = mfunc.max_min()
+                    context["den_min_val"] = round(context["den_min_val"],3)
+                    context["den_max_val"] = round(context["den_max_val"],3)
+                    if context["den_max_percent"] == -1:
+                        # we want 2sd upper and 100 lower
+                        context["den_max_percent"] = 3/context["den_max_val"]*100
+                    print("MinAndMax",context["den_min_val"],context["den_max_val"])
+                    
                     print("Time taken to get slice",datetime.datetime.now()-t1)
                     t1 = datetime.datetime.now()                    
                     nybs = settings_dic["naybs"]
                     if nybs == "Y":
-                        naybs = mfunc.get_slice_neighbours(central,linear,planar,width,samples,[0,0.5])
-                        print("Time taken to get neighbours",datetime.datetime.now()-t1)
-                        t1 = datetime.datetime.now()
+                        try:
+                            print("...getting neighbours")
+                            naybs = mfunc.get_slice_neighbours(central,linear,planar,width,samples,[0,0.5],log_level=1)
+                            print("Time taken to get neighbours",datetime.datetime.now()-t1)
+                            t1 = datetime.datetime.now()
+                        except Exception as e:
+                            context["message"] = "Neighbours " + str(e)                    
+                            return render(request, 'error.html', context)
                     else:
                         naybs = [[]]
                     context["nayb_mat"] = naybs                                                            
@@ -506,7 +562,7 @@ async def slice(request):
                     #print(context["density_mat"])
                     print("Time taken to add dots",datetime.datetime.now()-t1)
                     print("rendering... took",datetime.datetime.now()-ts)                    
-                    context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
+                    context["full_url"] = await sd.get_url(request,context, full_url_list)    
                     strmsg = "INFO:\t" + gl_ip + "\t" + pdb_code + ' slice time taken '+str(datetime.datetime.now())+' hours is '+ str(datetime.datetime.now()-ts)
                     logging.info(strmsg)
                     context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
@@ -518,7 +574,8 @@ async def slice(request):
             
         print("Time taken",datetime.datetime.now()-t1)
         print("rendering...")
-        context["full_url"] = await sd.get_url(request,context, ["pdb_code","width","samples","interp", "central","linear","planar","keyc","keyl","keyp","deriv","fo","fc","atomdots","posdots"])    
+        
+        context["full_url"] = await sd.get_url(request,context, full_url_list)    
         context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
         return render(request, 'slice.html', context)
     except Exception as e:

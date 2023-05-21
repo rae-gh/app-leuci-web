@@ -100,9 +100,22 @@ slice
     <tr>
         <td style="width:10%">Key planar</td>
         <td><input id="keyp" value="{{ keyp }}" name="keyp"/></td>
-    </tr>
-    
+    </tr>        
 </table>
+<!-- visual settings that we don't want to see -->
+<p style="display:none;visibility:collapse">            
+    <input id="den_plot_name" value="{{ den_plot_name }}" name="den_plot_name"/>
+    <input id="rad_plot_name" value="{{ rad_plot_name }}" name="rad_plot_name"/>
+    <input id="lap_plot_name" value="{{ lap_plot_name }}" name="lap_plot_name"/>
+    <input id="den_bar_name" value="{{ den_bar_name }}" name="den_bar_name"/>
+    <input id="rad_bar_name" value="{{ rad_bar_name }}" name="rad_bar_name"/>
+    <input id="lap_bar_name" value="{{ lap_bar_name }}" name="lap_bar_name"/>
+    <input id="den_hue_name" value="{{ den_hue_name }}" name="den_hue_name"/>
+    <input id="rad_hue_name" value="{{ rad_hue_name }}" name="rad_hue_name"/>
+    <input id="lap_hue_name" value="{{ lap_hue_name }}" name="lap_hue_name"/>    
+    <input id="den_min_percent" value="{{ den_min_percent }}" name="den_min_percent"/>
+    <input id="den_max_percent" value="{{ den_max_percent }}" name="den_max_percent"/>    
+</p>
 </form>
 
 <!------------------- JAVASCRIPT FUNCTIONS FOR THE PAGE ELEMENTS ------------------------------->

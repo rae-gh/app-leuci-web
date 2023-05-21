@@ -164,13 +164,27 @@ def get_slice_settings(request,keys = [], coords = []):
     navi,navdis = "x",0.1
     adots,pdots = "Y","N"
     naybs = "N"
+    # visual state
+    den_plot_name='contour'
+    rad_plot_name='heatmap'
+    lap_plot_name='contour'
+    den_bar_name='N'
+    rad_bar_name='N'
+    lap_bar_name='N'
+    den_hue_name='GBR'
+    rad_hue_name='BW'
+    lap_hue_name='BR'
+    den_min_percent = 100
+    den_max_percent = -1
 
     ret_dic = {}
 
     req_store = request.POST        
     if 'pdb_code' in request.GET:                
         req_store = request.GET
-    #print("tmp TODO", req_store)
+        print("USING GET")
+    else:
+        print("USING POST")
     
     if 'width' in req_store:
         width = int(req_store.get('width').lower())
@@ -206,7 +220,29 @@ def get_slice_settings(request,keys = [], coords = []):
         navdis = float(req_store.get('navdis'))
     if "neighbours" in req_store:
         naybs = req_store.get('neighbours')
-    
+
+    if "den_plot_name" in req_store:
+        den_plot_name = req_store.get('den_plot_name')
+    if "rad_plot_name" in req_store:
+        rad_plot_name = req_store.get('rad_plot_name')
+    if "lap_plot_name" in req_store:
+        lap_plot_name = req_store.get('lap_plot_name')
+    if "den_bar_name" in req_store:
+        den_bar_name = req_store.get('den_bar_name')
+    if "rad_bar_name" in req_store:
+        rad_bar_name = req_store.get('rad_bar_name')
+    if "lap_bar_name" in req_store:
+        lap_bar_name = req_store.get('lap_bar_name')
+    if "den_hue_name" in req_store:
+        den_hue_name = req_store.get('den_hue_name')
+    if "rad_hue_name" in req_store:
+        rad_hue_name = req_store.get('rad_hue_name')
+    if "lap_hue_name" in req_store:
+        lap_hue_name = req_store.get('lap_hue_name')    
+    if "den_min_percent" in req_store:
+        den_min_percent = req_store.get('den_min_percent')    
+    if "den_max_percent" in req_store:
+        den_max_percent = req_store.get('den_max_percent')    
     ret_dic["width"] = width
     ret_dic["samples"] = samples
     ret_dic["interp"] = interp
@@ -224,7 +260,18 @@ def get_slice_settings(request,keys = [], coords = []):
     ret_dic["posdots"] = pdots
     ret_dic["navdis"] = navdis
     ret_dic["naybs"] = naybs
-    
+    ret_dic["den_plot_name"] = den_plot_name
+    ret_dic["rad_plot_name"] = rad_plot_name
+    ret_dic["lap_plot_name"] = lap_plot_name
+    ret_dic["den_bar_name"] = den_bar_name
+    ret_dic["rad_bar_name"] = rad_bar_name
+    ret_dic["lap_bar_name"] = lap_bar_name
+    ret_dic["den_hue_name"] = den_hue_name
+    ret_dic["rad_hue_name"] = rad_hue_name
+    ret_dic["lap_hue_name"] = lap_hue_name
+    ret_dic["den_min_percent"] = den_min_percent
+    ret_dic["den_max_percent"] = den_max_percent
+        
     return ret_dic
 
     
