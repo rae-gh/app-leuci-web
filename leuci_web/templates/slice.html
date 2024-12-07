@@ -12,6 +12,13 @@ slice
 <table>
     <tr>
         <td>
+            <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
+                {% csrf_token %}                                    
+                    <input type="text" id="pdb_code" name="pdb_code" value="{{ pdb_code }}" style="width:0px;visibility:hidden;display:none">                                                        
+                    <button class="button button1" type="submit">back</button>                    
+            </form>
+        </td>
+        <td>
             <h2>Slice of <a href="{{ full_url }}" target = "_blank">{{ pdb_code }}</a></h2>
         </td>
         <td>
@@ -142,7 +149,7 @@ slice
                     <th>aa</th>
                     <td><button class="button button1"  type="submit">update (x,y,z)</button></td>
                     <th>distance</th>
-                    <td colspan="5"><button type="submit" class="button button1" onclick="addNaybs()">show neighbours</button></td>
+                    <!--<td colspan="5"><button type="submit" class="button button1" onclick="addNaybs()">show neighbours</button></td>-->
                 </tr>
                 <tr>
                     <th>Central</th>

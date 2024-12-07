@@ -8,7 +8,21 @@ projection
 
 {% block content %}
 <script src="{% static 'js/make_cross.js' %}"></script>
-<h2>Cross-section of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a> in orthogonal space</h2>
+<table>
+    <tr>
+    <td>
+        <form method="post" action="explore" style="padding:2px !important;margin:0px !important">
+            {% csrf_token %}                                    
+                <input type="text" id="pdb_code" name="pdb_code" value="{{ pdb_code }}" style="width:0px;visibility:hidden;display:none">                                                        
+                <button class="button button1" type="submit">back</button>                    
+        </form>
+    </td>
+    <td>
+        <h2>Cross-section of <a href={{ full_url }} target = "_blank">{{ pdb_code }}</a> in orthogonal space</h2>
+    </td>
+    </tr>
+</table>
+
 <h3>{{ message }} </h3>
 {% autoescape off %}
 

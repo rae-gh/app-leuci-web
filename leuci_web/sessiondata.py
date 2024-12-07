@@ -43,6 +43,7 @@ def get_pdbcode_and_status(request, ret="DATA"):
     Returns pdb info from current state or downloads from the ebi
     """    
     pdb_code,nav,on_file, in_loader, in_interp,mobj, mfunc = "", "",False,False,False,None,None
+    
     req_session = request.POST
     current_code = ""
     if 'pdb_code' in request.POST:
@@ -50,15 +51,18 @@ def get_pdbcode_and_status(request, ret="DATA"):
     elif 'pdb_code' in request.GET:        
         pdb_code = request.GET.get('pdb_code').lower()        
         req_session = request.GET
+        
+    #return pdb_code, nav,on_file, in_loader, in_interp,mobj
+    #if 'pdb_code' in request.session:
+    #    current_code = request.session['pdb_code'].lower()            
+    #    if pdb_code == "":
+    #        pdb_code = current_code    
     
-    if 'pdb_code' in request.session:
-        current_code = request.session['pdb_code'].lower()            
-        if pdb_code == "":
-            pdb_code = current_code    
     
-    if 'nav' in req_session:
-        nav = req_session.get('nav').lower()        
+    #if 'nav' in req_session:
+    #    nav = req_session.get('nav').lower()        
                 
+    
     mload = mapss.MapsManager().get_or_create(pdb_code,file=0,header=0,values=0)    
     if mload.exists() and mload.em_loaded:
         print("exists already")
@@ -74,7 +78,7 @@ def get_pdbcode_and_status(request, ret="DATA"):
                                 
     #return pdb_code, in_store,exists, mload
     print("return",pdb_code, nav,on_file, in_loader, in_interp)
-    request.session['pdb_code'] = pdb_code        
+    #request.session['pdb_code'] = pdb_code        
     if ret == "FUNC":
         return pdb_code, nav,on_file, in_loader, in_interp,mfunc
     else:
@@ -240,9 +244,11 @@ def get_slice_settings(request,keys = [], coords = []):
     if "lap_hue_name" in req_store:
         lap_hue_name = req_store.get('lap_hue_name')    
     if "den_min_percent" in req_store:
-        den_min_percent = req_store.get('den_min_percent')    
+        den_min_percent = float(req_store.get('den_min_percent'))
+        print("min%=",den_min_percent)
     if "den_max_percent" in req_store:
-        den_max_percent = req_store.get('den_max_percent')    
+        den_max_percent = float(req_store.get('den_max_percent'))
+        print("max%=",den_max_percent)
     ret_dic["width"] = width
     ret_dic["samples"] = samples
     ret_dic["interp"] = interp

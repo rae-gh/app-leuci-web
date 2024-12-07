@@ -59,6 +59,7 @@ def get_user(request):
     
         
 async def explore(request):
+    
     try:
         context = {
             'pdb_code': "", 
@@ -73,14 +74,19 @@ async def explore(request):
             }                
         
         t1 = datetime.datetime.now()
-        gl_user, gl_ip = await get_user(request)            
+        
+        gl_user, gl_ip = await get_user(request)                    
         pdb_code, nav,on_file, in_loader, in_interp, mobj = await sd.get_pdbcode_and_status(request)
         if pdb_code == "":
             return render(request, 'explore.html', context)
+        print("returning")
+        #return render(request,'explore.html')
         print(pdb_code, on_file, in_loader, in_interp)        
         context['pdb_code'] = pdb_code    
         print("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
+                
         logging.info("INFO:\t" + gl_ip + "\t" + pdb_code + ' was explored at '+str(datetime.datetime.now())+' hours')
+        
         
         if not on_file:
             print("Not on file",pdb_code)
@@ -454,16 +460,18 @@ async def slice(request):
                     den_rad = ["mv1","linear"]
                     den_only = ["nearest","numpest"]
 
+                    rettype = "2d"
+
                                         
                     if deriv == "three":
                         #vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
+                        vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
                         if settings_dic["interp"] not in den_only:
                             #rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
                             if settings_dic["interp"] in den_rad_lap:
                                 #laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
+                                laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
                         context["density_mat"] = vals
                         context["radient_mat"] = rads
                         context["laplacian_mat"] = laps                                                                                    
@@ -475,19 +483,21 @@ async def slice(request):
                         context["other_blocknone"] = "display:none;visibility: collapse"                        
                         if deriv == "density":
                             #vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1)
+                            #vals = [[5,5],[1,0]]
+                            vals = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=0,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
+                            print(vals)
                             context["density_mat"] = vals
                             context["den_blocknone"] = ""
                             context["one_blocknone"] = ""
                         elif deriv == "radient":
                             #rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1)
+                            rads = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=1,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
                             context["radient_mat"] = rads
                             context["rad_blocknone"] = ""
                             context["other_blocknone"] = ""
                         elif deriv == "laplacian":
                             #laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,degree=degree).tolist()
-                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1)
+                            laps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=2,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
                             context["laplacian_mat"] = laps
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
@@ -510,6 +520,7 @@ async def slice(request):
                         try:
                             print("...getting neighbours")
                             naybs = mfunc.get_slice_neighbours(central,linear,planar,width,samples,[0,0.5],log_level=1)
+                            print(naybs)
                             print("Time taken to get neighbours",datetime.datetime.now()-t1)
                             t1 = datetime.datetime.now()
                         except Exception as e:

@@ -29,7 +29,8 @@ SECRET_KEY = 'django-insecure-!j9cqzmv0!e7vx+++qp(pj!01)kiyd!567!o++mn+i4lr5(61g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True ### These settings are for debug ###
 #DEBUG = False ###!!! These are for release !!!###
-ALLOWED_HOSTS = ['leuci-web.azurewebsites.net', '127.0.0.1']
+#ALLOWED_HOSTS = ['leuci-web.azurewebsites.net', '127.0.0.1']
+ALLOWED_HOSTS = ['*'] #this is for docker containers
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # Application definition
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3.1',
     }
 }
 
@@ -141,8 +142,9 @@ print(os.path.join(BASE_DIR, "static"))
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+#DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+"""
 LOGGING = {
     'version': 1,
     # The version number of our log
@@ -153,7 +155,8 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': str(BASE_DIR) + '/leucilog_'+str(DEBUG) +'.log',
+            #'filename': str(BASE_DIR) + '/leucilog_'+str(DEBUG) +'.log',
+            'filename': './leucilog_'+str(DEBUG) +'.log',
         },
     },
     # A logger for WARNING which has a handler called 'file'. A logger can have multiple handler
@@ -166,6 +169,7 @@ LOGGING = {
         },
     },
 }
+"""
 
 #https://github.com/encode/uvicorn/issues/709
 from uvicorn.workers import UvicornWorker as BaseUvicornWorker
