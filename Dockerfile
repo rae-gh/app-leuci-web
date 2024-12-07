@@ -48,9 +48,9 @@ EXPOSE 8000
 # Run the application.
 #CMD uvicorn '.venv.lib.python3.9.site-packages.django.core.asgi:application' --host=0.0.0.0 --port=8000
 #CMD python manage.py runserver
-CMD ["python3","/app/manage.py","runserver","0.0.0.0:8000"]
+CMD ["python3","/app/manage.py","runserver_plus","0.0.0.0:8000"]
 
-# docker build -t leuci-docker .
+# docker build -t raea/leuci-docker .
 # docker run -p 8000:8000 leuci-docker
 # docker tag leuci-docker raea/leuci-docker
 # docker push raea/leuci-docker

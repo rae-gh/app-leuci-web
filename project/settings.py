@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'leuci_web.apps.LeuciWebConfig',    
+    "django_extensions",
 ]
 
 MIDDLEWARE = [

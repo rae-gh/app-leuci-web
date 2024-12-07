@@ -14,3 +14,5 @@ leuci-xyz
 leuci-pol
 leuci-map
 matplotlib
+django-extensions
+pyOpenSSL

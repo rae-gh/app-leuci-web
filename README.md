@@ -8,7 +8,10 @@ This uses python libraries available on PyPi
 ### Activate/install virtual environment
 ```
 python3 -m venv .venv
-source ./.venv/bin/activate
+pip install --upgrade pip
+pip install django-extensions Werkzeug
+
+source .venv/bin/activate
 ```
 ### Install the requirements
 ```
@@ -19,6 +22,11 @@ pip install -r requirements.txt --upgrade
 python manage.py runserver
 uvicorn project.asgi:application
 uvicorn project.asgi:application --reload
+
+or
+python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
+python manage.py runserver_plus
+
 
 ```
 http://127.0.0.1:8000/
