@@ -16,3 +16,4 @@ leuci-map
 matplotlib
 django-extensions
 pyOpenSSL
+Werkzeug
