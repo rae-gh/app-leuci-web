@@ -15,7 +15,7 @@ def explore(pdb_code):
          }
             
     from leuci_map import pdbobject as pob
-    my_pdb = pob.PdbObject(pdb_code,directory=DIR)
+    my_pdb = pob.PdbObject(pdb_code)
     context['pdb_code'] = pdb_code            
     if not my_pdb.exists():
         my_pdb.download()

@@ -7,16 +7,13 @@ This uses python libraries available on PyPi
 # Some instructions
 ### Activate/install virtual environment
 ```
-python3 -m venv .venv
+python3 -m venv .venv-leuci
+source .venv-leuci/bin/activate
 pip install --upgrade pip
-pip install django-extensions Werkzeug
-
-source .venv/bin/activate
-```
-### Install the requirements
-```
 pip install -r requirements.txt --upgrade
+
 ```
+
 ### Run the server locally using
 ```
 python manage.py runserver
