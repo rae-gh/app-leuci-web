@@ -58,7 +58,8 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://leuci-web.azurewebsites.net'    
+    'https://leuci-web.azurewebsites.net',    
+    'https://maptial.azurewebsites.net'
 ]
 
 ROOT_URLCONF = 'project.urls'

@@ -1,6 +1,6 @@
-import leuci_map.mapfunctions as mfun
-from leuci_map import mapsmanager as mapss
-from leuci_map import maploader as moad
+import maptial.map.mapfunctions as mfun
+from maptial.map import mapsmanager as mapss
+from maptial.map import maploader as moad
 
 DIR = "leuci_web/data/"
 

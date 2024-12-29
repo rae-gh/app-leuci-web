@@ -1,4 +1,7 @@
-pip-upgrader
+setuptools
+maptial
+scipy
+matplotlib
 pysam
 django
 uvicorn
@@ -6,14 +9,4 @@ gunicorn
 httpx
 plotly
 whitenoise
-numpy==1.24.2
-pandas==2.0.2
-biopython==1.81
-scipy
-leuci-pol==0.0.53
-leuci-xyz==0.0.25
-leuci-map
-matplotlib
 django-extensions
-pyOpenSSL
-Werkzeug

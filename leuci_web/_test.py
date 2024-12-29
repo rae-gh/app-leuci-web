@@ -14,7 +14,7 @@ def explore(pdb_code):
         'message':""
          }
             
-    from leuci_map import pdbobject as pob
+    from maptial.map import pdbobject as pob
     my_pdb = pob.PdbObject(pdb_code)
     context['pdb_code'] = pdb_code            
     if not my_pdb.exists():

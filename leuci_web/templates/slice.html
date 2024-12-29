@@ -183,7 +183,8 @@ slice
                                 <button onclick="return ChangeDeriv('density')" class="button button1" type="submit">density</button>
                                 <button onclick="return ChangeDeriv('radient')" class="button button1" type="submit">radient</button>                                
                                 <button onclick="return ChangeDeriv('laplacian')" class="button button1" type="submit">laplacian</button>
-                                <button onclick="return ChangeDeriv('three')" class="button button1" type="submit">all three</button>                        
+                                <!-- <button onclick="return ChangeDeriv('criticalpoint')" class="button button1" type="submit">criticalpoint</button> -->
+                                <!-- <button onclick="return ChangeDeriv('three')" class="button button1" type="submit">all three</button> -->                        
                             </td>
                             <th style="width:5px"></th>
                             <th style=""> Interpolation:</th>
@@ -264,6 +265,13 @@ slice
             <button type="button" class="button button1" onclick="makePlotSliceB(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle bar</button>
             <button type="button" class="button button1" onclick="makePlotSliceH(2,'{{ laplacian_mat|escapejs }}','slice_laplacian','lap_plot_name','lap_bar_name','lap_hue_name')">toggle hue</button>
         </th>
+        <!--<th style="text-align:center !important; width:400px;{{cp_blocknone}}">
+            CriticalPoint {{interp}} ({{fo}}Fo {{fc}}Fc)
+            <br/>
+            <button type="button" class="button button1" onclick="makePlotSliceP(2,'{{ criticalpoint_mat|escapejs }}','slice_criticalpoint','cp_plot_name','cp_bar_name','cp_hue_name')">toggle plot</button>
+            <button type="button" class="button button1" onclick="makePlotSliceB(2,'{{ criticalpoint_mat|escapejs }}','slice_criticalpoint','cp_plot_name','cp_bar_name','cp_hue_name')">toggle bar</button>
+            <button type="button" class="button button1" onclick="makePlotSliceH(2,'{{ criticalpoint_mat|escapejs }}','slice_criticalpoint','cp_plot_name','cp_bar_name','cp_hue_name')">toggle hue</button>
+        </th>-->
     </tr>
     <tr style="align-content:center;text-align:center;align-items:center;">        
         <td style="background-color:white;{{den_blocknone}};align-content:center;text-align:center;align-items:center;">
@@ -278,6 +286,7 @@ slice
         <td style="align-content:left; background-color:white;{{den_blocknone}}"><div id="slice_density" style="width:100%"></div></td>            
         <td style="background-color:white;{{rad_blocknone}}"><div id="slice_radient" style="width:100%"></div></td>            
         <td style="{{lap_blocknone}}"><div id="slice_laplacian" style="width:100%"></div></td>        
+        <!-- <td style="{{cp_blocknone}}"><div id="slice_criticalpoint" style="width:100%"></div></td> -->
     </tr>    
 </table>
 <!-- hiden values for the javascript display-->
@@ -314,23 +323,23 @@ slice
     }
 </script>
 <script>
-    function makePlotSliceP(deriv,mat_string, div_id, plot_id, bar_id, hue_id){
-        try{            
+    function makePlotSliceP(deriv,mat_string, div_id, plot_id, bar_id, hue_id){        
+        try{                        
             var cplot = document.getElementById(plot_id).value;
-            var cbar = document.getElementById(bar_id).value;
+            var cbar = document.getElementById(bar_id).value;            
             var chue = document.getElementById(hue_id).value;
             var sMin = document.getElementById("rangeValueMinLeft").value;
-            var sMax = document.getElementById("rangeValueMaxLeft").value;
+            var sMax = document.getElementById("rangeValueMaxLeft").value;            
             if (deriv > 0){
                 sMin = 100;
                 sMax = 100;
-            }
+            }            
             //plot type = element to change
             if (cplot == "heatmap"){
                 document.getElementById(plot_id).value = "contour";
             }else{
                 document.getElementById(plot_id).value = "heatmap";
-            }
+            }            
             var cplot = document.getElementById(plot_id).value;
             var mat_den = jQuery.parseJSON(mat_string);
             // atom and pos dots are the same for all slcies
@@ -511,6 +520,7 @@ slice
         var mat_den = jQuery.parseJSON('{{ density_mat|escapejs }}');            
         var mat_rad = jQuery.parseJSON('{{ radient_mat|escapejs }}');            
         var mat_lap = jQuery.parseJSON('{{ laplacian_mat|escapejs }}');
+        //var mat_cp = jQuery.parseJSON('{{ criticalpoint_mat|escapejs }}');
         // atom and pos dots are the same for all slcies        
         var zero_dotsX = jQuery.parseJSON('{{ zero_dotsX|escapejs }}');
         var zero_dotsY = jQuery.parseJSON('{{ zero_dotsY|escapejs }}');          
@@ -524,12 +534,15 @@ slice
         var den_plot_name = document.getElementById("den_plot_name").value;
         var rad_plot_name = document.getElementById("rad_plot_name").value;
         var lap_plot_name = document.getElementById("lap_plot_name").value;
+        //var cp_plot_name = document.getElementById("cp_plot_name").value;
         var den_bar_name = document.getElementById("den_bar_name").value;
         var rad_bar_name = document.getElementById("rad_bar_name").value;
         var lap_bar_name = document.getElementById("lap_bar_name").value;
+        //var cp_bar_name = document.getElementById("cp_bar_name").value;
         var den_hue_name = document.getElementById("den_hue_name").value;
         var rad_hue_name = document.getElementById("rad_hue_name").value;
         var lap_hue_name = document.getElementById("lap_hue_name").value;
+        //var cp_hue_name = document.getElementById("cp_hue_name").value;
 
         var den_min_percent = document.getElementById("den_min_percent").value;
         var den_max_percent = document.getElementById("den_max_percent").value;
@@ -539,6 +552,7 @@ slice
         makePlot(mat_den, "slice_density",den_plot_name,den_bar_name=="Y",den_hue_name,den_min_percent,den_max_percent,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
         makePlot(mat_rad, "slice_radient",rad_plot_name,rad_bar_name=="Y",rad_hue_name,100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
         makePlot(mat_lap, "slice_laplacian",lap_plot_name,lap_bar_name=="Y",lap_hue_name,100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
+        //makePlot(mat_cp, "slice_criticalpoint",cp_plot_name,cp_bar_name=="Y",cp_hue_name,100,100,zero_dotsX,zero_dotsY,posi_dotsX,posi_dotsY,negi_dotsX,negi_dotsY,naybs,den_min_val,den_max_val);
     }catch(err){
         alert("page init:" + err.message);
     }

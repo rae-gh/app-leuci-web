@@ -13,9 +13,9 @@ DIR = str(Path(__file__).resolve().parent )+ "/data/"
 
 
 #import leuci_map.maploader as moad
-from leuci_map import mapobject as mobj
-import leuci_map.mapfunctions as mfun
-from leuci_map import mapsmanager as mapss
+from maptial.map import mapobject as mobj
+import maptial.map.mapfunctions as mfun
+from maptial.map import mapsmanager as mapss
 mapss.MapsManager().set_dir(DIR)
 
 #from .classes import store as stor
@@ -172,12 +172,15 @@ def get_slice_settings(request,keys = [], coords = []):
     den_plot_name='contour'
     rad_plot_name='heatmap'
     lap_plot_name='contour'
+    cp_plot_name='contour'
     den_bar_name='N'
     rad_bar_name='N'
     lap_bar_name='N'
+    cp_bar_name='N'
     den_hue_name='GBR'
     rad_hue_name='BW'
     lap_hue_name='BR'
+    cp_hue_name='BR'
     den_min_percent = 100
     den_max_percent = -1
 
@@ -231,18 +234,24 @@ def get_slice_settings(request,keys = [], coords = []):
         rad_plot_name = req_store.get('rad_plot_name')
     if "lap_plot_name" in req_store:
         lap_plot_name = req_store.get('lap_plot_name')
+    if "cp_plot_name" in req_store:
+        cp_plot_name = req_store.get('cp_plot_name')
     if "den_bar_name" in req_store:
         den_bar_name = req_store.get('den_bar_name')
     if "rad_bar_name" in req_store:
         rad_bar_name = req_store.get('rad_bar_name')
     if "lap_bar_name" in req_store:
         lap_bar_name = req_store.get('lap_bar_name')
+    if "cp_bar_name" in req_store:
+        cp_bar_name = req_store.get('cp_bar_name')
     if "den_hue_name" in req_store:
         den_hue_name = req_store.get('den_hue_name')
     if "rad_hue_name" in req_store:
         rad_hue_name = req_store.get('rad_hue_name')
     if "lap_hue_name" in req_store:
         lap_hue_name = req_store.get('lap_hue_name')    
+    if "cp_hue_name" in req_store:
+        cp_hue_name = req_store.get('cp_hue_name')    
     if "den_min_percent" in req_store:
         den_min_percent = float(req_store.get('den_min_percent'))
         print("min%=",den_min_percent)
@@ -269,12 +278,15 @@ def get_slice_settings(request,keys = [], coords = []):
     ret_dic["den_plot_name"] = den_plot_name
     ret_dic["rad_plot_name"] = rad_plot_name
     ret_dic["lap_plot_name"] = lap_plot_name
+    ret_dic["cp_plot_name"] = cp_plot_name
     ret_dic["den_bar_name"] = den_bar_name
     ret_dic["rad_bar_name"] = rad_bar_name
     ret_dic["lap_bar_name"] = lap_bar_name
+    ret_dic["cp_bar_name"] = cp_bar_name
     ret_dic["den_hue_name"] = den_hue_name
     ret_dic["rad_hue_name"] = rad_hue_name
     ret_dic["lap_hue_name"] = lap_hue_name
+    ret_dic["cp_hue_name"] = cp_hue_name
     ret_dic["den_min_percent"] = den_min_percent
     ret_dic["den_max_percent"] = den_max_percent
         

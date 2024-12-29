@@ -40,6 +40,13 @@ If you want to get the static files together for debug False locally:
 ```
 python manage.py collectstatic
 ```
+### Deploying to azure from vscode
+There is a free deployment at [maptial@azure](https://maptial.azurewebsites.net/).  
+This is not satisfactory but it is better than nothing.  
+The free hosting for python apps is very bad and most things areimpossible to do.  
+This applicaiton os pretyy intensive for both data size, data download, and calculations.  
+
+
 
 
 

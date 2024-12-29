@@ -19,9 +19,9 @@ import random
 # my files
 from . import sessiondata as sd
 from .classes import admin as adm
-import leuci_xyz.vectorthree as v3 
-from leuci_xyz import spacetransform as space
-from leuci_map import mapsmanager as mapss
+import maptial.xyz.vectorthree as v3 
+from maptial.xyz import spacetransform as space
+from maptial.map import mapsmanager as mapss
 
 # Create your views here.
 def index(request):
@@ -248,22 +248,22 @@ async def projection(request):
         context["atoms_v"] = vs
         context["proj_xy"] = mfunc.get_map_projection("xy").tolist()        
         context["proj_yz"] = mfunc.get_map_projection("yz").tolist()
-        context["proj_zx"] = mfunc.get_map_projection("zx").tolist()               
-        #context["proj_xy_atoms"] = mfunc.get_map_projection("xy",xx[0]-1,xx[1]+1,yy[0]-1,yy[1]+1).tolist()        
-        #context["proj_yz_atoms"] = mfunc.get_map_projection("yz",yy[0]-1,yy[1]+1,zz[0]-1,zz[1]+1).tolist()
-        #context["proj_zx_atoms"] = mfunc.get_map_projection("zx",xx[0]-1,xx[1]+1,zz[0]-1,zz[1]+1).tolist()        
-        context["proj_xy_atoms"] = mfunc.get_map_projection("xy",xx[0],xx[1],yy[0],yy[1]).tolist()        
-        context["proj_yz_atoms"] = mfunc.get_map_projection("yz",yy[0],yy[1],zz[0],zz[1]).tolist()
-        context["proj_zx_atoms"] = mfunc.get_map_projection("zx",xx[0],xx[1],zz[0],zz[1]).tolist()        
+        context["proj_zx"] = mfunc.get_map_projection("zx").tolist()                               
+        xy_atoms = mfunc.get_map_projection("xy",int(xx[0]),int(xx[1]),int(yy[0]),int(yy[1])).tolist()        
+        yz_atoms = mfunc.get_map_projection("yz",int(yy[0]),int(yy[1]),int(zz[0]),int(zz[1])).tolist()
+        zx_atoms = mfunc.get_map_projection("zx",int(xx[0]),int(xx[1]),int(zz[0]),int(zz[1])).tolist()        
+        context["proj_xy_atoms"] = xy_atoms
+        context["proj_yz_atoms"] = yz_atoms
+        context["proj_zx_atoms"] = zx_atoms
         context["empty"] = []  
-        context["x_xy"] = [*range(yy[0],yy[1])]  
-        context["y_xy"] = [*range(xx[0],xx[1])]  
-        context["x_yz"] = [*range(zz[0],zz[1])]  
-        context["y_yz"] = [*range(yy[0],yy[1])]  
-        context["x_zx"] = [*range(zz[0],zz[1])]  
-        context["y_zx"] = [*range(xx[0],xx[1])]   
-
-        context["full_url"] = await sd.get_url(request, context,["pdb_code"])    
+        context["x_xy"] = [*range(int(yy[0]),int(yy[1]))]  
+        context["y_xy"] = [*range(int(xx[0]),int(xx[1]))]  
+        context["x_yz"] = [*range(int(zz[0]),int(zz[1]))]  
+        context["y_yz"] = [*range(int(yy[0]),int(yy[1]))]  
+        context["x_zx"] = [*range(int(zz[0]),int(zz[1]))]  
+        context["y_zx"] = [*range(int(xx[0]),int(xx[1]))]
+        context["full_url"] = await sd.get_url(request, context,["pdb_code"])                    
+        
         return render(request, 'projection.html', context)
 
 
@@ -304,6 +304,7 @@ async def slice(request):
         context["density_mat"] = [[]]
         context["radient_mat"] = [[]]
         context["laplacian_mat"] = [[]]
+        #context["criticalpoint_mat"] = [[]]
         make_slice = True
         print("Time taken to start check on file",datetime.datetime.now()-t1)
         t1 = datetime.datetime.now()
@@ -441,10 +442,11 @@ async def slice(request):
                     context["disl"] = round(ll.distance(linear),4)
                     context["disp"] = round(pp.distance(planar),4)
                     
-                    vals,rads,laps = [[]],[[]],[[]]
+                    vals,rads,laps,cps = [[]],[[]],[[]],[[]]
                     context["density_mat"] = vals
                     context["radient_mat"] = rads
                     context["laplacian_mat"] = laps
+                    #context["criticalpoint_mat"] = cps
 
                     context["den_blocknone"] = "" # "display:block"
                     context["rad_blocknone"] = ""
@@ -479,6 +481,7 @@ async def slice(request):
                         context["den_blocknone"] = "display:none;visibility: collapse"
                         context["rad_blocknone"] = "display:none;visibility: collapse"
                         context["lap_blocknone"] = "display:none;visibility: collapse"
+                        context["cp_blocknone"] = "display:none;visibility: collapse"
                         context["three_blocknone"] = "display:none;visibility: collapse"
                         context["other_blocknone"] = "display:none;visibility: collapse"                        
                         if deriv == "density":
@@ -501,13 +504,18 @@ async def slice(request):
                             context["laplacian_mat"] = laps
                             context["lap_blocknone"] = ""
                             context["other_blocknone"] = ""                                            
+                        #elif deriv == "criticalpoint":                            
+                        #    cps = mfunc.get_slice(central,linear,planar,width,samples,interp,deriv=3,fo=fo,fc=fc,log_level=1,ret_type=rettype).tolist()
+                        #    context["criticalpoint_mat"] = cps
+                        #    context["cp_blocknone"] = ""
+                        #    context["other_blocknone"] = ""                                            
                     
                     if not is_xray:
                         context["fo"] = 1
                         context["fc"] = 0
                     context["den_min_val"],context["den_max_val"] = mfunc.max_min()
-                    context["den_min_val"] = round(context["den_min_val"],3)
-                    context["den_max_val"] = round(context["den_max_val"],3)
+                    context["den_min_val"] = float(round(context["den_min_val"],3))
+                    context["den_max_val"] = float(round(context["den_max_val"],3))
                     if context["den_max_percent"] == -1:
                         # we want 2sd upper and 100 lower
                         context["den_max_percent"] = 3/context["den_max_val"]*100
@@ -560,14 +568,14 @@ async def slice(request):
                             # The xy heatmap has been arranged so the x value is above so linear is upwards, so the y axis (ok a bit confusing.... should I change it)?
                             if posDp.A > 0 and posDp.A < samples and posDp.B > 0 and posDp.B < samples:
                                 if abs(posDp.C) < 0.001:
-                                    context["zero_dotsX"].append(posDp.B)
-                                    context["zero_dotsY"].append(posDp.A)
+                                    context["zero_dotsX"].append(float(posDp.B))
+                                    context["zero_dotsY"].append(float(posDp.A))
                                 elif posDp.C > 0:
-                                    context["posi_dotsX"].append(posDp.B)
-                                    context["posi_dotsY"].append(posDp.A)
+                                    context["posi_dotsX"].append(float(posDp.B))
+                                    context["posi_dotsY"].append(float(posDp.A))
                                 elif posDp.C < 0:
-                                    context["negi_dotsX"].append(posDp.B)
-                                    context["negi_dotsY"].append(posDp.A)
+                                    context["negi_dotsX"].append(float(posDp.B))
+                                    context["negi_dotsY"].append(float(posDp.A))
                                                                                                                               
                     print("Density MAT------")
                     #print(context["density_mat"])
@@ -576,7 +584,7 @@ async def slice(request):
                     context["full_url"] = await sd.get_url(request,context, full_url_list)    
                     strmsg = "INFO:\t" + gl_ip + "\t" + pdb_code + ' slice time taken '+str(datetime.datetime.now())+' hours is '+ str(datetime.datetime.now()-ts)
                     logging.info(strmsg)
-                    context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
+                    context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")                    
                     return render(request, 'slice.html', context)
                     
                 except Exception as e:
@@ -587,7 +595,7 @@ async def slice(request):
         print("rendering...")
         
         context["full_url"] = await sd.get_url(request,context, full_url_list)    
-        context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")
+        context["messages"].append("Time taken " + str(round((datetime.datetime.now()-ts).total_seconds(),3)) + " seconds")        
         return render(request, 'slice.html', context)
     except Exception as e:
         context["message"] = str(e)                
