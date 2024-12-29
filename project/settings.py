@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-!j9cqzmv0!e7vx+++qp(pj!01)kiyd!567!o++mn+i4lr5(61g
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True ### These settings are for debug ###
-#DEBUG = False ###!!! These are for release !!!###
+#DEBUG = True ### These settings are for debug ###
+DEBUG = False ###!!! These are for release !!!###
 #ALLOWED_HOSTS = ['leuci-web.azurewebsites.net', '127.0.0.1']
 ALLOWED_HOSTS = ['*'] #this is for docker containers
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

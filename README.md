@@ -44,7 +44,10 @@ python manage.py collectstatic
 There is a free deployment at [maptial@azure](https://maptial.azurewebsites.net/).  
 This is not satisfactory but it is better than nothing.  
 The free hosting for python apps is very bad and most things areimpossible to do.  
-This applicaiton os pretyy intensive for both data size, data download, and calculations.  
+This applicaiton os pretty intensive for both data size, data download, and calculations.  
+
+To deploy with the vscode azure extenstion, when logged in, just rightclick on the maptial 
+web app and select "deploy".
 
 
 

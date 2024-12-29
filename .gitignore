@@ -139,3 +139,4 @@ leuci_web/staticfiles/*.js
 leuci_web/static/js/*.js
 
 leuci_web/data/*
+profile.publishsettings
